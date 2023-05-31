@@ -1,0 +1,13 @@
+version: "3.6"
+services:
+  minio:
+    image: minio/minio:latest
+    restart: always
+    ports:
+      - "9000:9000"
+      - "29001:9001"
+    container_name: satellite-minio
+    environment:
+      - MINIO_ACCESS_KEY=satellite
+      - MINIO_SECRET_KEY=123qweA#
+    command: server /data -console-address ":9001"
