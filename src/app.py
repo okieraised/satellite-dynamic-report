@@ -7,10 +7,11 @@ import geopandas as gpd
 import os
 import pandas as pd
 
-from constants.constants import MAPBOX_API_KEY, OK_LONG, OK_LAT
-from layout.default_layout import default_figure
+from constants.constants import MAPBOX_API_KEY, OK_LONG, OK_LAT, YEARS
+from layout.layout import map_layout, slider_layout
+import dash_bootstrap_components as dbc
 
-# Init Dash app
+
 app = dash.Dash(
         __name__,
         meta_tags=[
@@ -19,49 +20,45 @@ app = dash.Dash(
                 "content": "width=device-width, initial-scale=1"
             }
         ],
-        title="Dynamic Report"
+        title="Dynamic Report",
     )
 
 server = app.server
 
 
-app.layout = html.Div(
-        dcc.Graph(
-            id='map',
-            style={'marginLeft': '0px',
-                   'marginRight': '0px',
-                   'margin-top': '10px',
-                   'margin-bottom': '0px'},
-            figure=default_figure(),
-            config=dict(responsive=True, displayModeBar=False)
-        ),
-    )
-
-
-slider_layout = html.Div(
-    id="slider-container",
+left_side_layout = html.Div(
+    id="left-side-map",
     children=[
-        html.P(
-            id="slider-text",
-            children="Drag the slider to change the year:",
-        ),
-        dcc.Slider(
-            id="years-slider",
-            min=min(YEARS),
-            max=max(YEARS),
-            value=min(YEARS),
-            marks={
-                str(year): {
-                    "label": str(year),
-                    "style": {"color": "#7fafdf"},
-                }
-                for year in YEARS
-            },
-        ),
-    ],
+        slider_layout,
+        map_layout
+    ]
 )
 
-app.layout = slider_layout
+
+
+app.layout = html.Div(
+    id="root",
+    children=[
+        html.Div(
+            id="title",
+            children=[
+                dbc.Row(
+                    [html.H1("Satellite Dynamic Report Viewer")],
+                    justify="center",
+                    align="center",
+                    className="h-50",
+                )
+            ],
+            style={
+                'width': '100%',
+                'display': 'flex',
+                'align-items': 'center',
+                'justify-content': 'center'
+            }
+        ),
+        left_side_layout
+    ]
+)
 
 if __name__ == "__main__":
     app.run_server(debug=True, port=18050, processes=1, threaded=True)
