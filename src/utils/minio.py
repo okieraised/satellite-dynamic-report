@@ -1,6 +1,9 @@
 import os
 import boto3
 
+from botocore.client import Config
+from botocore.exceptions import ClientError
+
 MINIO_ENDPOINT_URL = os.getenv('MINIO_ENDPOINT_URL')
 MINIO_ACCESS_KEY_ID = os.getenv('MINIO_ACCESS_KEY')
 MINIO_SECRET_ACCESS_KEY = os.getenv('MINIO_SECRET_KEY')
@@ -16,7 +19,7 @@ class Minio:
 
         self.s3_object = boto3.client('s3', endpoint_url=MINIO_ENDPOINT_URL, aws_access_key_id=MINIO_ACCESS_KEY_ID,
                                       aws_secret_access_key=MINIO_SECRET_ACCESS_KEY,
-                                      config=BotoConfig(
+                                      config=Config(
                                           signature_version=MINIO_SIGNATURE_VERSION),
                                       region_name=MINIO_REGION_NAME)
 
@@ -24,7 +27,7 @@ class Minio:
                                       endpoint_url=MINIO_ENDPOINT_URL,
                                       aws_access_key_id=MINIO_ACCESS_KEY_ID,
                                       aws_secret_access_key=MINIO_SECRET_ACCESS_KEY,
-                                      config=BotoConfig(
+                                      config=Config(
                                           signature_version=MINIO_SIGNATURE_VERSION),
                                       region_name=MINIO_REGION_NAME)
 
@@ -44,9 +47,8 @@ class Minio:
             try:
                 self.s3_object.head_bucket(Bucket=setting.bucket)
             except ClientError:
-                print('bucket %s not exists, create the new one' %
-                      setting.bucket)
-                self.s3_object.create_bucket(Bucket=setting.bucket)
+                print('bucket %s not exists, create the new one' % setting.bucket)
+                self.s3_object.create_bucket(Bucket=MINIO_BUCKET)
         except Exception as err:
             print('could not create or read %s bucket' % setting.bucket)
             raise err

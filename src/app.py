@@ -38,6 +38,31 @@ app.layout = html.Div(
     )
 
 
+slider_layout = html.Div(
+    id="slider-container",
+    children=[
+        html.P(
+            id="slider-text",
+            children="Drag the slider to change the year:",
+        ),
+        dcc.Slider(
+            id="years-slider",
+            min=min(YEARS),
+            max=max(YEARS),
+            value=min(YEARS),
+            marks={
+                str(year): {
+                    "label": str(year),
+                    "style": {"color": "#7fafdf"},
+                }
+                for year in YEARS
+            },
+        ),
+    ],
+)
+
+app.layout = slider_layout
+
 if __name__ == "__main__":
     app.run_server(debug=True, port=18050, processes=1, threaded=True)
 

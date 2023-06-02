@@ -1,4 +1,11 @@
 import os
+import datetime
+
+today = datetime.date.today()
+year = today.year
+
+YEARS = list(range(2003, year+1))
+
 
 MAPBOX_API_KEY = os.getenv("MAPBOX_API_KEY")
 
