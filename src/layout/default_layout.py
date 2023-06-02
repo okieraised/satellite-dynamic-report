@@ -12,6 +12,7 @@ def default_map_layout() -> go.Layout:
             center=dict(lat=OK_LAT, lon=OK_LONG),
             style="open-street-map",
         ),
+        margin=dict(l=0, r=0, t=0, b=0)
     )
 
     return map_layout
