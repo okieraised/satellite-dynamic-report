@@ -1,6 +1,6 @@
 import plotly.graph_objects as go
 
-from constants.constants import MAPBOX_API_KEY, OK_LAT, OK_LONG, mapbox_style
+from constants.constants import MAPBOX_API_KEY, OK_LAT, OK_LONG, MapType
 
 
 def default_map_layout() -> go.Layout:
@@ -10,7 +10,7 @@ def default_map_layout() -> go.Layout:
             accesstoken=MAPBOX_API_KEY,
             zoom=4.5,
             center=dict(lat=OK_LAT, lon=OK_LONG),
-            style=mapbox_style,
+            style=MapType.DEFAULT,
         ),
         margin=dict(l=0, r=0, t=0, b=0),
     )
