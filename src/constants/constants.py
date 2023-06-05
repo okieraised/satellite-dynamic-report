@@ -55,3 +55,5 @@ class DropdownMapper(object):
         },
     ]
 
+    WeekNumber = [{"label": f"Week {i}", "value": i} for i in list(range(1, 53))]
+

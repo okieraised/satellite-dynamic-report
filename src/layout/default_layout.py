@@ -34,6 +34,12 @@ def default_data() -> go.Scattermapbox:
     return data
 
 
+# fig= px.imshow(elevation, color_continuous_scale=bamako)
+# my_layout= dict(title_text='Big Tujunga Cachement-California', title_x=0.5, width =700, height=500, template='none',
+#                   coloraxis_colorbar=dict(len=0.75, thickness=25))
+# fig.update_layout(**my_layout)
+
+
 def default_figure() -> dict:
     return dict(
         data=[default_data()],

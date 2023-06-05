@@ -56,7 +56,13 @@ app.layout = html.Div(
 )
 
 if __name__ == "__main__":
-    app.run_server(debug=True, port=18050, processes=1, threaded=True)
+    import rasterio as rio
+
+    with rio.open('./sample_data/EVI/2022-07-30.tif') as src:
+        elevation = src.read(1)
+        print(elevation)
+
+    # app.run_server(debug=True, port=18050, processes=1, threaded=True)
 
 
 '''

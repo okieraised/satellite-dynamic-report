@@ -813,13 +813,17 @@ hr {
     margin-bottom: 6.6rem;
 }
 
-/*#map-dropdown {*/
-/*    margin-bottom: 6.6rem;*/
-/*}*/
+#basemap-dropdown {
+    margin-bottom: 2rem;
+}
 
-/*#data-dropdown {*/
-/*    margin-bottom: 6.6rem;*/
-/*}*/
+#data-dropdown {
+    margin-bottom: 2rem;
+}
+
+#week-dropdown {
+    margin-bottom: 2rem;
+}
 
 /* Dropdown
 –––––––––––––––––––––––––––––––––––––––––––––––––– */

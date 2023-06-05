@@ -3,6 +3,7 @@ import dash_bootstrap_components as dbc
 from dash import dcc, html
 from constants.constants import YEARS, DropdownMapper, MapType
 from layout.default_layout import default_figure
+from utils.datetime_utils import get_current_week_number
 
 title_layout = html.Div(
     id="title",
@@ -33,11 +34,6 @@ map_layout = dcc.Graph(
 )
 
 
-# html.P(
-        #     id="slider-text",
-        #     children="Drag the slider to change the year:",
-        # ),
-
 slider_layout = html.Div(
     id="slider-container",
     children=[
@@ -51,8 +47,8 @@ slider_layout = html.Div(
                             id="data-dropdown",
                         ),
                     ],
-                    className='four columns',
-                    style=dict(width='50%')
+                    className='three columns',
+                    style=dict(width='33.333333333333%')
 
                 ),
                 html.Div(
@@ -60,11 +56,22 @@ slider_layout = html.Div(
                         dcc.Dropdown(
                             options=DropdownMapper.WorldMap,
                             value=MapType.DEFAULT,
-                            id="map-dropdown",
+                            id="basemap-dropdown",
                         ),
                     ],
-                    className='four columns',
-                    style=dict(width='50%')
+                    className='three columns',
+                    style=dict(width='33.333333333333%')
+                ),
+                html.Div(
+                    [
+                        dcc.Dropdown(
+                            options=DropdownMapper.WeekNumber,
+                            value=get_current_week_number(),
+                            id="week-dropdown",
+                        ),
+                    ],
+                    className='three columns',
+                    style=dict(width='33.333333333333%')
                 )
             ],
             className='row',
