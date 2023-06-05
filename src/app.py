@@ -46,8 +46,7 @@ app.layout = html.Div(
             children=[
                 html.Div(
                     id="left-column",
-                    children=[slider_layout,
-                              map_layout],
+                    children=[slider_layout, map_layout],
                 ),
                 html.Div(
                     id="graph-container",

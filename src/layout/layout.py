@@ -35,15 +35,38 @@ map_layout = dcc.Graph(
 slider_layout = html.Div(
     id="slider-container",
     children=[
-        html.P(
-            id="slider-text",
-            children="Drag the slider to change the year:",
+        # html.P(
+        #     id="slider-text",
+        #     children="Drag the slider to change the year:",
+        # ),
+        dcc.Dropdown(
+            options=[
+                {
+                    "label": "Histogram of total number of deaths (single year)",
+                    "value": "show_absolute_deaths_single_year",
+                },
+                {
+                    "label": "Histogram of total number of deaths (1999-2016)",
+                    "value": "absolute_deaths_all_time",
+                },
+                {
+                    "label": "Age-adjusted death rate (single year)",
+                    "value": "show_death_rate_single_year",
+                },
+                {
+                    "label": "Trends in age-adjusted death rate (1999-2016)",
+                    "value": "death_rate_all_time",
+                },
+            ],
+            value="show_death_rate_single_year",
+            id="map-dropdown",
         ),
+
         dcc.Slider(
             id="slider",
             min=min(YEARS),
             max=max(YEARS),
-            value=min(YEARS),
+            value=max(YEARS),
             step=1,
             marks={
                 str(year): {

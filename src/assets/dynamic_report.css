@@ -335,6 +335,11 @@ p {
     font-size: 2rem;
 }
 
+#map-dropdown {
+    margin-bottom: 2rem !important;
+    font-size: 2rem;
+}
+
 
 @media only screen and (max-width: 550px) {
     .rc-slider-mark-text {
@@ -805,6 +810,10 @@ hr {
 
 
 #chart-dropdown {
+    margin-bottom: 6.6rem;
+}
+
+#map-dropdown {
     margin-bottom: 6.6rem;
 }
 
