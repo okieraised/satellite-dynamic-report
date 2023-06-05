@@ -7,8 +7,9 @@ import geopandas as gpd
 import os
 import pandas as pd
 
-from constants.constants import MAPBOX_API_KEY, OK_LONG, OK_LAT, YEARS
-from layout.layout import map_layout, slider_layout, title_layout
+from constants.constants import MAPBOX_API_KEY, OK_LONG, OK_LAT, YEARS, MapType
+from layout.default_layout import default_figure
+from layout.layout import map_layout, slider_layout, title_layout, graph_layout, graph_layout2
 import dash_bootstrap_components as dbc
 
 
@@ -40,7 +41,20 @@ app.layout = html.Div(
     id="root",
     children=[
         title_layout,
-        left_side_layout
+        html.Div(
+            id="app-container",
+            children=[
+                html.Div(
+                    id="left-column",
+                    children=[slider_layout,
+                              map_layout],
+                ),
+                html.Div(
+                    id="graph-container",
+                    children=[graph_layout, graph_layout2],
+                ),
+            ]
+        )
     ]
 )
 
