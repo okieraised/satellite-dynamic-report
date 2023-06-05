@@ -38,13 +38,10 @@ class Minio:
     def put(self, buf, minio_path):
         try:
             self.s3_object.put_object(Bucket=MINIO_BUCKET, Key=minio_path, Body=buf)
-        except:
-            return False
+        except Exception as err:
+            return err
 
     def minio_put(self, buf, minio_path):
-        '''
-        If bucket is not existed then create it first
-        '''
         try:
             try:
                 self.s3_object.head_bucket(Bucket=MINIO_BUCKET)
