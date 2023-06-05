@@ -35,8 +35,6 @@ left_side_layout = html.Div(
     ]
 )
 
-
-
 app.layout = html.Div(
     id="root",
     children=[
@@ -59,5 +57,17 @@ app.layout = html.Div(
 
 if __name__ == "__main__":
     app.run_server(debug=True, port=18050, processes=1, threaded=True)
+
+
+'''
+Absolutely, the data will be available in a server, it can be AWS or Microsoft.  
+The data types are TIFF, .shp, and .csv.   
+There will be a folder with the data for each week 1to52 and other folder with historic data. 
+ The TIFF data represents different layers of information and ideally, we would like that the dynamic report displays 
+ one of the layers in a map, but having the option to choose different layers.  In addition, to display the different 
+ layer values when moving the cursor over the map and when clicking in a region generating the graphs for that layer.  
+ The graphs would be YeartoDate value and comparison with the historic value for that pixel. 
+ The other graph will be the field average and how it compares to that pixel value in the year to date.
+'''
 
 
