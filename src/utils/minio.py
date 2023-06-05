@@ -17,10 +17,13 @@ class Minio:
 
     def __init__(self):
 
-        self.s3_object = boto3.client('s3', endpoint_url=MINIO_ENDPOINT_URL, aws_access_key_id=MINIO_ACCESS_KEY_ID,
+        self.s3_object = boto3.client('s3',
+                                      endpoint_url=MINIO_ENDPOINT_URL,
+                                      aws_access_key_id=MINIO_ACCESS_KEY_ID,
                                       aws_secret_access_key=MINIO_SECRET_ACCESS_KEY,
                                       config=Config(
-                                          signature_version=MINIO_SIGNATURE_VERSION),
+                                          signature_version=MINIO_SIGNATURE_VERSION
+                                      ),
                                       region_name=MINIO_REGION_NAME)
 
         self.s3_file = boto3.resource('s3',
@@ -28,14 +31,13 @@ class Minio:
                                       aws_access_key_id=MINIO_ACCESS_KEY_ID,
                                       aws_secret_access_key=MINIO_SECRET_ACCESS_KEY,
                                       config=Config(
-                                          signature_version=MINIO_SIGNATURE_VERSION),
+                                          signature_version=MINIO_SIGNATURE_VERSION
+                                      ),
                                       region_name=MINIO_REGION_NAME)
 
     def put(self, buf, minio_path):
         try:
-            self.s3_object.put_object(
-                Bucket=MINIO_BUCKET, Key=minio_path, Body=buf)
-
+            self.s3_object.put_object(Bucket=MINIO_BUCKET, Key=minio_path, Body=buf)
         except:
             return False
 
@@ -45,27 +47,24 @@ class Minio:
         '''
         try:
             try:
-                self.s3_object.head_bucket(Bucket=setting.bucket)
+                self.s3_object.head_bucket(Bucket=MINIO_BUCKET)
             except ClientError:
-                print('bucket %s not exists, create the new one' % setting.bucket)
+                print(f'bucket {MINIO_BUCKET} not exists, create the new one')
                 self.s3_object.create_bucket(Bucket=MINIO_BUCKET)
         except Exception as err:
-            print('could not create or read %s bucket' % setting.bucket)
+            print(f'could not create or read {MINIO_BUCKET} bucket')
             raise err
 
         try:
-            print('putting file object %s in to bucket %s ' %
-                  (minio_path, setting.bucket))
-            self.s3_object.put_object(
-                Bucket=setting.bucket, Key=minio_path, Body=buf)
+            print(f'putting file object {minio_path} in to bucket {MINIO_BUCKET}')
+            self.s3_object.put_object(Bucket=MINIO_BUCKET, Key=minio_path, Body=buf)
         except Exception as err:
             print('put file object error')
             raise err
 
     def minio_get(self, minio_path):
         try:
-            response = self.s3_object.get_object(
-                Bucket=setting.bucket, Key=minio_path)
+            response = self.s3_object.get_object(Bucket=MINIO_BUCKET, Key=minio_path)
             return response['Body'].read()
         except Exception as err:
             print(err)
@@ -73,16 +72,14 @@ class Minio:
 
     def minio_upload(self, file_path, minio_path):
         try:
-            self.s3_file.Bucket(setting.bucket).upload_file(
-                file_path, minio_path)
+            self.s3_file.Bucket(MINIO_BUCKET).upload_file(file_path, minio_path)
         except Exception as err:
             print(err)
             return False
 
     def minio_download(self, minio_path, file_path):
         try:
-            self.s3_file.Bucket(setting.bucket).download_file(
-                minio_path, file_path)
+            self.s3_file.Bucket(MINIO_BUCKET).download_file(minio_path, file_path)
         except Exception as err:
             print(err)
             return False

@@ -8,7 +8,7 @@ import os
 import pandas as pd
 
 from constants.constants import MAPBOX_API_KEY, OK_LONG, OK_LAT, YEARS
-from layout.layout import map_layout, slider_layout
+from layout.layout import map_layout, slider_layout, title_layout
 import dash_bootstrap_components as dbc
 
 
@@ -39,23 +39,7 @@ left_side_layout = html.Div(
 app.layout = html.Div(
     id="root",
     children=[
-        html.Div(
-            id="title",
-            children=[
-                dbc.Row(
-                    [html.H1("Satellite Dynamic Report Viewer")],
-                    justify="center",
-                    align="center",
-                    className="h-50",
-                )
-            ],
-            style={
-                'width': '100%',
-                'display': 'flex',
-                'align-items': 'center',
-                'justify-content': 'center'
-            }
-        ),
+        title_layout,
         left_side_layout
     ]
 )
