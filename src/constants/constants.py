@@ -18,5 +18,3 @@ class MapType(object):
     OEN_STREET_MAP = "open-street-map"
     SATELLITE = "satellite"
     DEFAULT = "mapbox://styles/plotlymapbox/cjvprkf3t1kns1cqjxuxmwixz"
-
-# mapbox_style = "mapbox://styles/plotlymapbox/cjvprkf3t1kns1cqjxuxmwixz"
