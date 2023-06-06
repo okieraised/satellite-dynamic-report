@@ -55,14 +55,41 @@ app.layout = html.Div(
     ]
 )
 
+
+# import dash_leaflet as dl
+#
+# app.layout = html.Div([
+#     dl.Map(style={'width': '1000px', 'height': '500px'},
+#            center=[55, -4],
+#            zoom=5,
+#            id="map",
+#            children=[
+#                dl.LayersControl([
+#
+#                    # dl.Overlay(dl.LayerGroup(dl.TileLayer(
+#                    #     url="https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_nolabels/{z}/{x}/{y}.png",
+#                    #     id="TileMap")), name="BaseMap", checked=True),
+#                    # COG fed into Tilelayer using TiTiler url (taken from r["tiles"][0])
+#                    dl.Overlay(dl.LayerGroup(dl.TileLayer(url='./sample_data/EVI/2022-07-30.tif', opacity=0.8, id="WindSpeed@100m")),
+#                               name="WS@100m", checked=True),
+#                    dl.LayerGroup(id="layer"),
+#                    # set colorbar and location in app
+#                    # dl.Colorbar(colorscale="viridis", width=20, height=150, min=minv, max=maxv, unit='m/s',
+#                    #             position="bottomright"),
+#                    # info,
+#
+#                ])
+#            ])
+# ])
+
 if __name__ == "__main__":
-    import rasterio as rio
+    # import rasterio as rio
+    #
+    # with rio.open('./sample_data/EVI/2022-07-30.tif') as src:
+    #     elevation = src.read(1)
+    #     print(elevation)
 
-    with rio.open('./sample_data/EVI/2022-07-30.tif') as src:
-        elevation = src.read(1)
-        print(elevation)
-
-    # app.run_server(debug=True, port=18050, processes=1, threaded=True)
+    app.run_server(debug=True, port=18050, processes=1, threaded=True)
 
 
 '''

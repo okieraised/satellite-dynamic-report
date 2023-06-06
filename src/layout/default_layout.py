@@ -1,4 +1,5 @@
 import plotly.graph_objects as go
+import geopandas as gpd
 
 from constants.constants import MAPBOX_API_KEY, OK_LAT, OK_LONG, MapType
 
@@ -11,6 +12,14 @@ def default_map_layout() -> go.Layout:
             zoom=4.5,
             center=dict(lat=OK_LAT, lon=OK_LONG),
             style=MapType.DEFAULT,
+            layers=[
+                dict(
+                    sourcetype='raster',
+                    source='sample_data/EVI/2022-07-30.tif',
+                )
+            ],
+
+
         ),
         margin=dict(l=0, r=0, t=0, b=0),
     )
@@ -28,7 +37,7 @@ def default_data() -> go.Scattermapbox:
             color='blue',
             opacity=0.7
         ),
-        hoverinfo='text'
+        hoverinfo='text',
     )
 
     return data
