@@ -4,13 +4,16 @@ import boto3
 from botocore.client import Config
 from botocore.exceptions import ClientError
 
-MINIO_ENDPOINT_URL = os.getenv('MINIO_ENDPOINT_URL')
-MINIO_ACCESS_KEY_ID = os.getenv('MINIO_ACCESS_KEY')
-MINIO_SECRET_ACCESS_KEY = os.getenv('MINIO_SECRET_KEY')
-MINIO_SIGNATURE_VERSION = os.getenv('MINIO_SIGNATURE_VERSION')
-MINIO_REGION_NAME = os.getenv('MINIO_REGION_NAME')
-MINIO_BUCKET = os.getenv('MINIO_BUCKET')
-MINIO_PUBLIC_ENDPOINT_URL = os.getenv('MINIO_PUBLIC_ENDPOINT_URL', '')
+from constants.constants import MINIO_ENDPOINT_URL, MINIO_ACCESS_KEY_ID, MINIO_SIGNATURE_VERSION, MINIO_REGION_NAME, \
+    MINIO_SECRET_ACCESS_KEY, MINIO_BUCKET
+
+# MINIO_ENDPOINT_URL = os.getenv('MINIO_ENDPOINT_URL')
+# MINIO_ACCESS_KEY_ID = os.getenv('MINIO_ACCESS_KEY')
+# MINIO_SECRET_ACCESS_KEY = os.getenv('MINIO_SECRET_KEY')
+# MINIO_SIGNATURE_VERSION = os.getenv('MINIO_SIGNATURE_VERSION')
+# MINIO_REGION_NAME = os.getenv('MINIO_REGION_NAME')
+# MINIO_BUCKET = os.getenv('MINIO_BUCKET')
+# MINIO_PUBLIC_ENDPOINT_URL = os.getenv('MINIO_PUBLIC_ENDPOINT_URL', '')
 
 
 class Minio:
@@ -81,5 +84,53 @@ class Minio:
             print(err)
             return False
 
+    def minio_head_bucket(self, bucket_name):
+        try:
+            try:
+                self.s3_object.head_bucket(Bucket=bucket_name)
+                return True
+            except ClientError:
+                print(f'bucket {bucket_name} not exists')
+                return False
+        except Exception as err:
+            print(f'could not read {MINIO_BUCKET} bucket: {err}')
+            return False
+
+    # def minio_list_object(self):
+    #     self.s3_object.
+
+    # list_objects(bucket_name, prefix=None, recursive=False, start_after=None, include_user_meta=False,
+    # include_version=False, use_api_v1=False, use_url_encoding_type=True)
+
 
 Minio_Object = Minio()
+
+if __name__ == "__main__":
+    # print("MINIO_BUCKET", MINIO_BUCKET)
+    # Minio_Object.minio_head_bucket(MINIO_BUCKET)
+    raw = Minio_Object.minio_get("/shapefile/housel/Housel_v2.shp")
+
+    print("raw", raw)
+    new = raw.hex()
+    print(new)
+
+    import json
+    import codecs
+    import geopandas as gpd
+    import io
+    import binascii
+
+    raw_img = io.BytesIO(raw)
+
+    with open("./output.shp", "wb") as f:
+        f.write(raw_img.getbuffer())
+
+    print("raw_img", raw_img)
+
+    data = gpd.read_file(raw_img, driver = 'GeoJSON')
+
+    # data = json.loads(raw)
+
+    print("data", data)
+
+

@@ -1,13 +1,23 @@
 import os
 import datetime
+from dotenv import load_dotenv
+
 
 today = datetime.date.today()
 year = today.year
 
 YEARS = list(range(2003, year+1))
 
+load_dotenv()
 
 MAPBOX_API_KEY = os.getenv("MAPBOX_API_KEY")
+MINIO_ENDPOINT_URL = os.getenv('MINIO_ENDPOINT_URL')
+MINIO_ACCESS_KEY_ID = os.getenv('MINIO_ACCESS_KEY')
+MINIO_SECRET_ACCESS_KEY = os.getenv('MINIO_SECRET_KEY')
+MINIO_SIGNATURE_VERSION = os.getenv('MINIO_SIGNATURE_VERSION')
+MINIO_REGION_NAME = os.getenv('MINIO_REGION_NAME')
+MINIO_BUCKET = os.getenv('MINIO_BUCKET')
+MINIO_PUBLIC_ENDPOINT_URL = os.getenv('MINIO_PUBLIC_ENDPOINT_URL', '')
 
 OK_LAT = 35.481918
 OK_LONG = -97.508469
