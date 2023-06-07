@@ -96,11 +96,13 @@ class Minio:
             print(f'could not read {MINIO_BUCKET} bucket: {err}')
             return False
 
-    # def minio_list_object(self):
-    #     self.s3_object.
-
-    # list_objects(bucket_name, prefix=None, recursive=False, start_after=None, include_user_meta=False,
-    # include_version=False, use_api_v1=False, use_url_encoding_type=True)
+    def minio_list_objects(self, bucket_name: str, prefix: str, recursive: bool = False):
+        try:
+            response = self.s3_object.list_objects(Bucket=bucket_name, Prefix=prefix)
+            return response['Contents']
+        except Exception as err:
+            print(f'could not list objects {MINIO_BUCKET} bucket: {err}')
+            return False
 
 
 Minio_Object = Minio()
@@ -108,29 +110,34 @@ Minio_Object = Minio()
 if __name__ == "__main__":
     # print("MINIO_BUCKET", MINIO_BUCKET)
     # Minio_Object.minio_head_bucket(MINIO_BUCKET)
-    raw = Minio_Object.minio_get("/shapefile/housel/Housel_v2.shp")
+    resp = Minio_Object.minio_list_objects(MINIO_BUCKET, prefix='shapefile')
 
-    print("raw", raw)
-    new = raw.hex()
-    print(new)
+    print(resp)
 
-    import json
-    import codecs
-    import geopandas as gpd
-    import io
-    import binascii
 
-    raw_img = io.BytesIO(raw)
-
-    with open("./output.shp", "wb") as f:
-        f.write(raw_img.getbuffer())
-
-    print("raw_img", raw_img)
-
-    data = gpd.read_file(raw_img, driver = 'GeoJSON')
-
-    # data = json.loads(raw)
-
-    print("data", data)
+    # raw = Minio_Object.minio_get("/shapefile/housel/Housel_v2.shp")
+    #
+    # print("raw", raw)
+    # new = raw.hex()
+    # print(new)
+    #
+    # import json
+    # import codecs
+    # import geopandas as gpd
+    # import io
+    # import binascii
+    #
+    # raw_img = io.BytesIO(raw)
+    #
+    # with open("./output.shp", "wb") as f:
+    #     f.write(raw_img.getbuffer())
+    #
+    # print("raw_img", raw_img)
+    #
+    # data = gpd.read_file(raw_img, driver = 'GeoJSON')
+    #
+    # # data = json.loads(raw)
+    #
+    # print("data", data)
 
 

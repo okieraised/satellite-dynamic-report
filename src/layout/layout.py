@@ -1,8 +1,10 @@
 import dash_bootstrap_components as dbc
+import plotly.graph_objs as go
 
 from dash import dcc, html
 from constants.constants import YEARS, DropdownMapper, MapType
 from layout.default_layout import default_figure
+from time_series.time_series import read_csv
 from utils.datetime_utils import get_current_week_number
 
 title_layout = html.Div(
@@ -102,13 +104,20 @@ slider_layout = html.Div(
 graph_layout = dcc.Graph(
     id="selected-data-1",
     figure=dict(
-        data=[dict(x=0, y=0)],
+        data=[go.Scatter(x=read_csv()[0], y=read_csv()[1])],
         layout=dict(
             paper_bgcolor="#1f2630",
             plot_bgcolor="#1f2630",
             font=dict(color="#2cfec1"),
             autofill=True,
             margin=dict(t=75, r=50, b=50, l=50),
+            title='Housel',
+            # xaxis={
+            #     'title': 'Year'
+            # },
+            # yaxis={
+            #     'title': 'TA'
+            # }
         ),
     ),
 )
@@ -116,7 +125,7 @@ graph_layout = dcc.Graph(
 graph_layout2 = dcc.Graph(
     id="selected-data-2",
     figure=dict(
-        data=[dict(x=0, y=0)],
+        data=[go.Scatter(x=read_csv()[0], y=read_csv()[2])],
         layout=dict(
             paper_bgcolor="#1f2630",
             plot_bgcolor="#1f2630",

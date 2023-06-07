@@ -22,6 +22,9 @@ MINIO_PUBLIC_ENDPOINT_URL = os.getenv('MINIO_PUBLIC_ENDPOINT_URL', '')
 OK_LAT = 35.481918
 OK_LONG = -97.508469
 
+OH_LAT = 40.367474
+OH_LONG = -82.996216
+
 
 class MapType(object):
     OUTDOORS = "outdoors"
