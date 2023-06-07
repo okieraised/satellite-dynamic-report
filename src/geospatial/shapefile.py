@@ -3,6 +3,10 @@ import plotly.graph_objects as go
 import json
 
 
+def load_shapefile_as_geojson():
+    return
+
+
 if __name__ == "__main__":
     # geodf = gpd.read_file('/Users/tripham/Documents/Sample_Data/1_shp_files_v2/Housel_v2.shp')
 
