@@ -7,10 +7,9 @@ from utils.file import list_file_with_same_ext
 def shapefile_to_geojson(file_path: str):
     try:
         dir_name = os.path.dirname(file_path)
-        f_name = os.path.basename(f_path)
+        f_name = os.path.basename(file_path)
         f_name_wo_ext = os.path.splitext(f_name)
         geojson_f_path = "/".join([dir_name, f_name_wo_ext[0] + ".geojson"])
-
         shp_file = geopandas.read_file(file_path)
         shp_file.to_file(geojson_f_path, driver='GeoJSON')
         return True
@@ -21,11 +20,9 @@ def shapefile_to_geojson(file_path: str):
 
 
 if __name__ == "__main__":
-    f_path = "/Users/tripham/Documents/Sample_Data/1_shp_files_v2/Housel_v2.shp"
 
     res = list_file_with_same_ext("/Users/tripham/Documents/Sample_Data/1_shp_files_v2", ".shp")
-
-    print(res)
-
     for p in res:
-        shapefile_to_geojson(p)
+        print(p)
+        print(shapefile_to_geojson(p))
+
