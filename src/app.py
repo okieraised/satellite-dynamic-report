@@ -9,7 +9,8 @@ import pandas as pd
 
 from constants.constants import MAPBOX_API_KEY, OK_LONG, OK_LAT, YEARS, MapType
 from layout.default_layout import default_figure
-from layout.layout import map_layout, slider_layout, title_layout, graph_layout, graph_layout2
+from layout.layout import map_layout, slider_layout, title_layout, graph_layout, graph_layout2, graph_layout_3, \
+    graph_layout_4
 import dash_bootstrap_components as dbc
 
 
@@ -51,7 +52,22 @@ app.layout = html.Div(
                     children=[graph_layout, graph_layout2],
                 ),
             ]
-        )
+        ),
+        html.Div(
+            id="graph-container-bottom",
+            children=[
+                html.Div(
+                    [graph_layout_3],
+                    className='four columns',
+                    style=dict(width='48%')
+                ),
+                html.Div(
+                    [graph_layout_4],
+                    className='four columns',
+                    style=dict(width='48%')
+                ),
+            ],
+        ),
     ]
 )
 

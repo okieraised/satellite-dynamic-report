@@ -7,7 +7,7 @@ def read_csv():
     #
     # print(df['TA'].tolist())
 
-    print(df)
+    # print(df)
 
     return [df.index.tolist(), df['TA'].tolist(), df['SW'].tolist()]
 

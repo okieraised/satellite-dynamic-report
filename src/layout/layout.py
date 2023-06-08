@@ -50,7 +50,7 @@ slider_layout = html.Div(
                         ),
                     ],
                     className='three columns',
-                    style=dict(width='33.333333333333%')
+                    style=dict(width='25%')
 
                 ),
                 html.Div(
@@ -62,7 +62,7 @@ slider_layout = html.Div(
                         ),
                     ],
                     className='three columns',
-                    style=dict(width='33.333333333333%')
+                    style=dict(width='25%')
                 ),
                 html.Div(
                     [
@@ -73,7 +73,18 @@ slider_layout = html.Div(
                         ),
                     ],
                     className='three columns',
-                    style=dict(width='33.333333333333%')
+                    style=dict(width='25%')
+                ),
+                html.Div(
+                    [
+                        dcc.Dropdown(
+                            options=DropdownMapper.SiteName,
+                            value="",
+                            id="site-dropdown",
+                        ),
+                    ],
+                    className='three columns',
+                    style=dict(width='25%')
                 )
             ],
             className='row',
@@ -112,12 +123,16 @@ graph_layout = dcc.Graph(
             autofill=True,
             margin=dict(t=75, r=50, b=50, l=50),
             title='Housel',
-            # xaxis={
-            #     'title': 'Year'
-            # },
-            # yaxis={
-            #     'title': 'TA'
-            # }
+            xaxis={
+                'title': dict(
+                    text="Year"
+                )
+            },
+            yaxis={
+                'title': dict(
+                    text="TA"
+                )
+            }
         ),
     ),
 )
@@ -135,3 +150,53 @@ graph_layout2 = dcc.Graph(
         ),
     ),
 )
+
+graph_layout_3 = dcc.Graph(
+                    id="selected-data-3",
+                    figure=dict(
+                        data=[go.Scatter(x=[], y=[])],
+                        layout=dict(
+                            paper_bgcolor="#1f2630",
+                            plot_bgcolor="#1f2630",
+                            font=dict(color="#2cfec1"),
+                            autofill=True,
+                            margin=dict(t=75, r=50, b=50, l=50),
+                            title='Housel',
+                            xaxis={
+                                'title': dict(
+                                    text="Year"
+                                )
+                            },
+                            yaxis={
+                                'title': dict(
+                                    text="TA"
+                                )
+                            }
+                        ),
+                    ),
+                )
+
+graph_layout_4 = dcc.Graph(
+                    id="selected-data-4",
+                    figure=dict(
+                        data=[go.Scatter(x=[], y=[])],
+                        layout=dict(
+                            paper_bgcolor="#1f2630",
+                            plot_bgcolor="#1f2630",
+                            font=dict(color="#2cfec1"),
+                            autofill=True,
+                            margin=dict(t=75, r=50, b=50, l=50),
+                            title='Housel',
+                            xaxis={
+                                'title': dict(
+                                    text="Year"
+                                )
+                            },
+                            yaxis={
+                                'title': dict(
+                                    text="TA"
+                                )
+                            }
+                        ),
+                    ),
+                )

@@ -33,6 +33,12 @@ class MapType(object):
     DEFAULT = "mapbox://styles/plotlymapbox/cjvprkf3t1kns1cqjxuxmwixz"
 
 
+class Site(object):
+    Housel = "Housel"
+    Pratt = "Pratt"
+    Weisse = "Weisse"
+
+
 class DropdownMapper(object):
     WorldMap = [
         {
@@ -70,3 +76,13 @@ class DropdownMapper(object):
 
     WeekNumber = [{"label": f"Week {i}", "value": i} for i in list(range(1, 53))]
 
+    SiteName = [{"label": val, "value": val} for key, val in Site.__dict__.items() if not key.startswith('__')]
+
+
+
+
+if __name__ == "__main__":
+
+    x = [{"label": val, "value": val} for key, val in Site.__dict__.items() if not key.startswith('__')]
+
+    print(x)
