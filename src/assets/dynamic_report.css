@@ -760,6 +760,14 @@ hr {
     #selected-data-2 {
         height: 20rem;
     }
+
+    #selected-data-3 {
+        height: 20rem;
+    }
+
+    #selected-data-4 {
+        height: 20rem;
+    }
 }
 
 @media (min-width: 1251px) {
@@ -836,7 +844,15 @@ hr {
     margin-bottom: 2rem;
 }
 
-#data-dropdown {
+#data-dropdown-1 {
+    margin-bottom: 2rem;
+}
+
+#data-dropdown-2 {
+    margin-bottom: 2rem;
+}
+
+#data-dropdown-3 {
     margin-bottom: 2rem;
 }
 
