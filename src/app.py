@@ -57,11 +57,7 @@ app.layout = html.Div(
             id="graph-container-bottom",
             children=[
                 graph_layout_3,
-                html.Div(
-                    [graph_layout_4],
-                    className='four columns',
-                    style=dict(width='48%')
-                ),
+                graph_layout_4,
             ],
         ),
     ]
