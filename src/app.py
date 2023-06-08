@@ -67,9 +67,6 @@ app.layout = html.Div(
     Input(component_id='basemap-dropdown', component_property='value')
 )
 def update_basemap(input_value):
-
-    print(f"input_value: {input_value}")
-
     map_figure = dict(
         data=[default_data()],
         layout=go.Layout(
