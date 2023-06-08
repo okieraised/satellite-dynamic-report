@@ -2,8 +2,9 @@ import dash_bootstrap_components as dbc
 import plotly.graph_objs as go
 
 from dash import dcc, html
-from constants.constants import YEARS, DropdownMapper, MapType, Site
-from layout.default_layout import default_figure
+from constants.constants import YEARS, DropdownMapper, MapType, Site, MAPBOX_API_KEY, OH_LONG, OH_LAT
+from geospatial.shapefile import default_geojson_data
+from layout.default_layout import default_data
 from time_series.time_series import read_csv
 from utils.datetime_utils import get_current_week_number
 
@@ -43,15 +44,26 @@ def generate_map_dropdown_menu(dropdown_id: str, options: any, value: any) -> ht
     return dropdown
 
 
-
-
 map_layout = dcc.Graph(
     id='heatmap-container',
     style={'marginLeft': '0px',
            'marginRight': '0px',
            'margin-top': '10px',
            'margin-bottom': '0px'},
-    figure=default_figure(),
+    figure=dict(
+        data=[default_data()],
+        layout=go.Layout(
+            autosize=True,
+            mapbox=dict(
+                accesstoken=MAPBOX_API_KEY,
+                zoom=6,
+                center=dict(lat=OH_LAT, lon=OH_LONG),
+                style=MapType.DEFAULT,
+                layers=default_geojson_data(),
+            ),
+            margin=dict(l=0, r=0, t=0, b=0),
+        )
+    ),
     config=dict(responsive=True, displayModeBar=False)
 )
 

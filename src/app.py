@@ -7,8 +7,9 @@ import geopandas as gpd
 import os
 import pandas as pd
 
-from constants.constants import MAPBOX_API_KEY, OK_LONG, OK_LAT, YEARS, MapType
-from layout.default_layout import default_figure
+from constants.constants import MAPBOX_API_KEY, OK_LONG, OK_LAT, YEARS, MapType, OH_LAT, OH_LONG
+from geospatial.shapefile import default_geojson_data
+from layout.default_layout import default_data
 from layout.layout import map_layout, slider_layout, generate_title_layout, graph_layout, graph_layout2, graph_layout_3, \
     graph_layout_4
 import dash_bootstrap_components as dbc
@@ -55,13 +56,36 @@ app.layout = html.Div(
         ),
         html.Div(
             id="graph-container-bottom",
-            children=[
-                graph_layout_3,
-                graph_layout_4,
-            ],
+            children=[graph_layout_3, graph_layout_4],
         ),
     ]
 )
+
+
+@app.callback(
+    Output(component_id='heatmap-container', component_property='figure'),
+    Input(component_id='basemap-dropdown', component_property='value')
+)
+def update_basemap(input_value):
+
+    print(f"input_value: {input_value}")
+
+    map_figure = dict(
+        data=[default_data()],
+        layout=go.Layout(
+            autosize=True,
+            mapbox=dict(
+                accesstoken=MAPBOX_API_KEY,
+                zoom=6,
+                center=dict(lat=OH_LAT, lon=OH_LONG),
+                style=input_value,
+                layers=default_geojson_data(),
+            ),
+            margin=dict(l=0, r=0, t=0, b=0),
+        )
+    )
+
+    return map_figure
 
 
 if __name__ == "__main__":
