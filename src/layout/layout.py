@@ -2,10 +2,10 @@ import dash_bootstrap_components as dbc
 import plotly.graph_objs as go
 
 from dash import dcc, html
-from constants.constants import YEARS, DropdownMapper, MapType, Site, MAPBOX_API_KEY, OH_LONG, OH_LAT
+from constants.constants import YEARS, DropdownMapper, MapType, Site, MAPBOX_API_KEY, OH_LONG, OH_LAT, DEFAULT_SITE
 from geospatial.shapefile import default_geojson_data
 from layout.default_layout import default_data
-from time_series.time_series import read_csv
+from time_series.time_series import read_csv, VariableMapper
 from utils.datetime_utils import get_current_week_number
 
 
@@ -84,7 +84,7 @@ slider_layout = html.Div(
                                            value=get_current_week_number()),
                 generate_map_dropdown_menu(dropdown_id="site-dropdown",
                                            options=DropdownMapper.SiteName,
-                                           value=Site.Pratt),
+                                           value=DEFAULT_SITE),
             ],
             className='row',
             style={
@@ -187,6 +187,68 @@ graph_layout_3 = html.Div(
     className='four columns',
     style=dict(width='48%')
 )
+
+
+def generate_time_series_graph_by_site(dropdown_id: str, graph_id: str, data: dict, site_name: Site=DEFAULT_SITE):
+
+    # Init variables
+    dropdown_options = {}
+    dropdown_value = list(VariableMapper.keys())[0]
+    x_axis_title = "Year"
+    y_axis_title = VariableMapper.get(dropdown_value)
+
+    # Retrieve actual data
+    site_data = data.get(site_name, None)
+    if not site_data:
+        raise Exception(f"Site {site_name} not found.")
+
+    dropdown_options = site_data["var"]
+
+    default_option = dropdown_options[0]
+
+    dropdown_value = default_option["value"]
+    y_axis_title = default_option["label"]
+
+    df = site_data["data"]
+
+    graph_layout_3 = html.Div(
+        [
+            dcc.Dropdown(
+                options=dropdown_options,
+                value=dropdown_value,
+                id=dropdown_id,
+            ),
+            dcc.Graph(
+                id=graph_id,
+                figure=dict(
+                    data=[go.Scatter(x=df.index.tolist(), y=df[dropdown_value].tolist())],
+                    layout=dict(
+                        paper_bgcolor="#1f2630",
+                        plot_bgcolor="#1f2630",
+                        font=dict(color="#2cfec1"),
+                        autofill=True,
+                        margin=dict(t=75, r=50, b=50, l=50),
+                        title=f"Time series data for {site_name}",
+                        xaxis={
+                            'title': dict(
+                                text=x_axis_title
+                            )
+                        },
+                        yaxis={
+                            'title': dict(
+                                text=y_axis_title
+                            )
+                        }
+                    ),
+                ),
+            )
+        ],
+        className='four columns',
+        style=dict(width='48%')
+    )
+
+    return graph_layout_3
+
 
 graph_layout_4 = html.Div(
     [

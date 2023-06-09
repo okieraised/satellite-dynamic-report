@@ -30,21 +30,18 @@ def read_csv():
     return [df.index.tolist(), df['TA'].tolist(), df['SW'].tolist()]
 
 
-def query_time_series_data():
+def query_time_series_data() -> dict:
+
+    res = dict()
+
     objects = Minio_Object.minio_list_objects(MINIO_BUCKET, prefix='csv')
 
     for obj in objects:
-
         dropdown_mappers = []
 
         try:
             key = obj.get('Key')
-            print(key)
-
-            print(str(key).split("/")[1])
-
-
-
+            site_name = str(key).split("/")[1].capitalize()
             raw = Minio_Object.minio_get(key)
             df = pd.read_csv(io.BytesIO(raw), index_col='Date')
             columns = df.columns.tolist()
@@ -52,9 +49,12 @@ def query_time_series_data():
             for col in columns:
                 if VariableMapper.get(col):
                     dropdown_mappers.append({"label": VariableMapper.get(col), "value": col})
+            res[site_name] = dict(
+                var=dropdown_mappers,
+                data=df
+            )
 
-            print(dropdown_mappers)
-            return
+            return res
         except Exception as err:
             print(f"error retrieving object: {err}")
             continue

@@ -39,6 +39,9 @@ class Site(object):
     Weisse = "Weisse"
 
 
+DEFAULT_SITE = Site.Housel
+
+
 class DropdownMapper(object):
     WorldMap = [
         {

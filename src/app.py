@@ -11,8 +11,12 @@ from constants.constants import MAPBOX_API_KEY, OK_LONG, OK_LAT, YEARS, MapType,
 from geospatial.shapefile import default_geojson_data
 from layout.default_layout import default_data
 from layout.layout import map_layout, slider_layout, generate_title_layout, graph_layout, graph_layout2, graph_layout_3, \
-    graph_layout_4
+    graph_layout_4, generate_time_series_graph_by_site
 import dash_bootstrap_components as dbc
+
+from time_series.time_series import query_time_series_data
+
+csv_data = query_time_series_data()
 
 
 app = dash.Dash(
@@ -56,11 +60,15 @@ app.layout = html.Div(
         ),
         html.Div(
             id="graph-container-bottom",
-            children=[graph_layout_3, graph_layout_4],
+            children=[generate_time_series_graph_by_site(dropdown_id="data-dropdown-2", graph_id="selected-data-3", data=csv_data), graph_layout_4],
         ),
     ]
 )
 
+
+########################################################################################################################
+# Callback
+########################################################################################################################
 
 @app.callback(
     Output(component_id='heatmap-container', component_property='figure'),
@@ -85,13 +93,8 @@ def update_basemap(input_value):
     return map_figure
 
 
-if __name__ == "__main__":
-    # import rasterio as rio
-    #
-    # with rio.open('./sample_data/EVI/2022-07-30.tif') as src:
-    #     elevation = src.read(1)
-    #     print(elevation)
 
+if __name__ == "__main__":
     app.run_server(debug=True, port=18050, processes=1, threaded=True)
 
 
