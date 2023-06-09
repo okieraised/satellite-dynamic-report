@@ -33,15 +33,6 @@ app = dash.Dash(
 
 server = app.server
 
-
-left_side_layout = html.Div(
-    id="left-side-map",
-    children=[
-        slider_layout,
-        map_layout
-    ]
-)
-
 app.layout = html.Div(
     id="root",
     children=[
