@@ -152,41 +152,41 @@ graph_layout2 = dcc.Graph(
 
 
 
-graph_layout_3 = html.Div(
-    [
-        dcc.Dropdown(
-            options={},
-            value="dsdsdsd",
-            id="data-dropdown-2",
-        ),
-        dcc.Graph(
-            id="selected-data-3",
-            figure=dict(
-                data=[go.Scatter(x=[], y=[])],
-                layout=dict(
-                    paper_bgcolor="#1f2630",
-                    plot_bgcolor="#1f2630",
-                    font=dict(color="#2cfec1"),
-                    autofill=True,
-                    margin=dict(t=75, r=50, b=50, l=50),
-                    title='Housel',
-                    xaxis={
-                        'title': dict(
-                            text="Year"
-                        )
-                    },
-                    yaxis={
-                        'title': dict(
-                            text="TA"
-                        )
-                    }
-                ),
-            ),
-        )
-    ],
-    className='four columns',
-    style=dict(width='48%')
-)
+# graph_layout_3 = html.Div(
+#     [
+#         dcc.Dropdown(
+#             options={},
+#             value="dsdsdsd",
+#             id="data-dropdown-2",
+#         ),
+#         dcc.Graph(
+#             id="selected-data-3",
+#             figure=dict(
+#                 data=[go.Scatter(x=[], y=[])],
+#                 layout=dict(
+#                     paper_bgcolor="#1f2630",
+#                     plot_bgcolor="#1f2630",
+#                     font=dict(color="#2cfec1"),
+#                     autofill=True,
+#                     margin=dict(t=75, r=50, b=50, l=50),
+#                     title='Housel',
+#                     xaxis={
+#                         'title': dict(
+#                             text="Year"
+#                         )
+#                     },
+#                     yaxis={
+#                         'title': dict(
+#                             text="TA"
+#                         )
+#                     }
+#                 ),
+#             ),
+#         )
+#     ],
+#     className='four columns',
+#     style=dict(width='48%')
+# )
 
 
 def generate_time_series_graph_by_site(dropdown_id: str, graph_id: str, data: dict, site_name: Site=DEFAULT_SITE):
