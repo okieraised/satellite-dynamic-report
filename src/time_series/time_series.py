@@ -36,12 +36,15 @@ def query_time_series_data() -> dict:
 
     objects = Minio_Object.minio_list_objects(MINIO_BUCKET, prefix='csv')
 
+    logger.info(f"Retrieved {len(objects)} csv objects")
+
     for obj in objects:
         dropdown_mappers = []
 
         try:
             key = obj.get('Key')
             site_name = str(key).split("/")[1].capitalize()
+            logger.info(f"object site_name: {site_name}")
             raw = Minio_Object.minio_get(key)
             df = pd.read_csv(io.BytesIO(raw), index_col='Date')
             columns = df.columns.tolist()
@@ -54,10 +57,11 @@ def query_time_series_data() -> dict:
                 data=df
             )
 
-            return res
         except Exception as err:
             print(f"error retrieving object: {err}")
             continue
+
+    return res
 
 
 def read_time_series_data():
@@ -66,4 +70,5 @@ def read_time_series_data():
 
 if __name__ == "__main__":
     # read_csv()
-    query_time_series_data()
+    # query_time_series_data()
+    print("here")
