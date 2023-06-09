@@ -11,7 +11,7 @@ from constants.constants import MAPBOX_API_KEY, OK_LONG, OK_LAT, YEARS, MapType,
 from geospatial.shapefile import default_geojson_data
 from layout.default_layout import default_data, generate_default_time_series_fig
 from layout.layout import map_layout, slider_layout, generate_title_layout, graph_layout_1, graph_layout_2, \
-    graph_layout_4, generate_time_series_graph_by_site
+    generate_time_series_graph_by_site
 import dash_bootstrap_components as dbc
 
 from time_series.time_series import query_time_series_data, VariableMapper
@@ -77,7 +77,10 @@ app.layout = html.Div(
     Output(component_id='heatmap-container', component_property='figure'),
     Input(component_id='basemap-dropdown', component_property='value')
 )
-def update_basemap(input_value):
+def update_basemap(input_map_value):
+
+    logger.info(f"input_map_value: {input_map_value}")
+
     map_figure = dict(
         data=[default_data()],
         layout=go.Layout(
@@ -86,7 +89,7 @@ def update_basemap(input_value):
                 accesstoken=MAPBOX_API_KEY,
                 zoom=6,
                 center=dict(lat=OH_LAT, lon=OH_LONG),
-                style=input_value,
+                style=input_map_value,
                 layers=default_geojson_data(),
             ),
             margin=dict(l=0, r=0, t=0, b=0),
@@ -104,7 +107,19 @@ def update_basemap(input_value):
     [
         Input(component_id='data-dropdown-2', component_property='value'),
         Input(component_id='site-dropdown', component_property='value'),
-    ]
+    ],
+    prevent_initial_call=True
+)
+@app.callback(
+    [
+        Output(component_id='selected-data-4', component_property='figure'),
+        Output(component_id='data-dropdown-3', component_property='options'),
+    ],
+    [
+        Input(component_id='data-dropdown-3', component_property='value'),
+        Input(component_id='site-dropdown', component_property='value'),
+    ],
+    prevent_initial_call=True
 )
 def update_time_series_graph(variable_input, site_input):
 
