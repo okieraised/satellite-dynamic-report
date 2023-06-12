@@ -41,6 +41,7 @@ python-dateutil @ file:///tmp/build/80754af9/python-dateutil_1626374649649/work
 python-dotenv==1.0.0
 pytz==2023.3
 rasterio==1.3.7
+rioxarray==0.14.1
 s3transfer==0.6.1
 shapely @ file:///private/var/folders/sy/f16zz6x50xz3113nwtb9bvq00000gp/T/abs_73st2w3xix/croot/shapely_1680636308240/work
 six @ file:///tmp/build/80754af9/six_1644875935023/work
@@ -49,3 +50,4 @@ tenacity @ file:///private/var/folders/sy/f16zz6x50xz3113nwtb9bvq00000gp/T/abs_c
 tzdata==2023.3
 urllib3==1.26.16
 Werkzeug @ file:///private/var/folders/sy/f16zz6x50xz3113nwtb9bvq00000gp/T/abs_fegt3z60s3/croot/werkzeug_1679489762631/work
+xarray==2023.5.0
