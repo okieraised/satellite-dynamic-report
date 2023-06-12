@@ -26,17 +26,17 @@ OH_LAT = 40.367474
 OH_LONG = -82.996216
 
 
+class Site(object):
+    Housel = "Housel"
+    Pratt = "Pratt"
+    Weisse = "Weisse"
+
+
 class MapType(object):
     OUTDOORS = "outdoors"
     OPEN_STREET_MAP = "open-street-map"
     SATELLITE = "satellite"
     DEFAULT = "mapbox://styles/plotlymapbox/cjvprkf3t1kns1cqjxuxmwixz"
-
-
-class Site(object):
-    Housel = "Housel"
-    Pratt = "Pratt"
-    Weisse = "Weisse"
 
 
 DEFAULT_SITE = Site.Housel
@@ -82,10 +82,6 @@ class DropdownMapper(object):
     SiteName = [{"label": val, "value": val} for key, val in Site.__dict__.items() if not key.startswith('__')]
 
 
-
-
 if __name__ == "__main__":
-
     x = [{"label": val, "value": val} for key, val in Site.__dict__.items() if not key.startswith('__')]
-
     print(x)
