@@ -102,7 +102,7 @@ class Minio:
             return response['Contents']
         except Exception as err:
             print(f'could not list objects {MINIO_BUCKET} bucket: {err}')
-            return False
+            return []
 
 
 Minio_Object = Minio()
@@ -111,7 +111,6 @@ if __name__ == "__main__":
     # print("MINIO_BUCKET", MINIO_BUCKET)
     # Minio_Object.minio_head_bucket(MINIO_BUCKET)
     resp = Minio_Object.minio_list_objects(MINIO_BUCKET, prefix='shapefile')
-
     print(resp)
 
 

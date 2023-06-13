@@ -60,69 +60,81 @@ def pol_to_bounding_box(pol):
 with rio.open('../data/tiff/2022-07-30.tif') as src:
     elevation = src.read(1)
 
+    array = src.read()
+    print(array.shape)
+
 
 if __name__ == "__main__":
 
     dst_crs = "EPSG:4326"
 
-    with rio.open('../data/tiff/2022-07-30.tif') as src:
-        elevation = src.read(1)
-        print(elevation)
-
-        px_vals = []
-
-        for x in range(elevation.shape[0]):
-            for y in range(elevation.shape[1]):
-                px_vals.append({'x': x,
-                                'y': y,
-                                'value': elevation[x, y]})
-
-        print(px_vals)
-
-    # with rio.open('../data/tiff/2022-07-30.tif') as src:
+    # with rio.open('../data/tiff/2022-07-30-2.tif') as src:
     #     elevation = src.read(1)
     #     print(elevation)
     #
-    #     input_crs = src.crs
-    #     input_gt = src.transform
+    #     array = src.read()
+    #     print(array.shape)
     #
-    #     print(f"input_crs: {input_crs}")
-    #     print(f"input_gt: {input_gt}")
+    #     px_vals = []
     #
-    #     src_transform = src.transform
+    #     for x in range(elevation.shape[0]):
+    #         for y in range(elevation.shape[1]):
+    #             px_vals.append({'x': x,
+    #                             'y': y,
+    #                             'value': elevation[x, y]})
     #
-    #     # calculate the transform matrix for the output
-    #     dst_transform, width, height = calculate_default_transform(
-    #         src.crs,
-    #         dst_crs,
-    #         src.width,
-    #         src.height,
-    #         *src.bounds,  # unpacks outer boundaries (left, bottom, right, top)
-    #     )
+    #     print(px_vals)
     #
-    #     # set properties for output
-    #     dst_kwargs = src.meta.copy()
-    #     dst_kwargs.update(
-    #         {
-    #             "crs": dst_crs,
-    #             "transform": dst_transform,
-    #             "width": width,
-    #             "height": height,
-    #             "nodata": 0,  # replace 0 with np.nan
-    #         }
-    #     )
+    #     print(px_vals[0])
     #
-    #     with rio.open("../data/tiff/2022-07-30-2.tif", "w", **dst_kwargs) as dst:
-    #         for i in range(1, src.count + 1):
-    #             reproject(
-    #                 source=rio.band(src, i),
-    #                 destination=rio.band(dst, i),
-    #                 src_transform=src.transform,
-    #                 src_crs=src.crs,
-    #                 dst_transform=dst_transform,
-    #                 dst_crs=dst_crs,
-    #                 resampling=Resampling.nearest,
-    #             )
+    #     print()
+
+
+
+    with rio.open('../data/tiff/tz850.tiff') as src:
+        elevation = src.read(1)
+        print(elevation)
+
+        input_crs = src.crs
+        input_gt = src.transform
+
+        print(f"input_crs: {input_crs}")
+        print(f"input_gt: {input_gt}")
+
+        src_transform = src.transform
+
+        # calculate the transform matrix for the output
+        dst_transform, width, height = calculate_default_transform(
+            src.crs,
+            dst_crs,
+            src.width,
+            src.height,
+            *src.bounds,  # unpacks outer boundaries (left, bottom, right, top)
+        )
+
+        # set properties for output
+        dst_kwargs = src.meta.copy()
+        dst_kwargs.update(
+            {
+                "crs": dst_crs,
+                "transform": dst_transform,
+                "width": width,
+                "height": height,
+                "nodata": 0,  # replace 0 with np.nan
+            }
+        )
+
+        with rio.open("../data/tiff/tz850-2.tiff", "w", **dst_kwargs) as dst:
+            for i in range(1, src.count + 1):
+                reproject(
+                    source=rio.band(src, i),
+                    destination=rio.band(dst, i),
+                    src_transform=src.transform,
+                    src_crs=src.crs,
+                    dst_transform=dst_transform,
+                    dst_crs=dst_crs,
+                    resampling=Resampling.nearest,
+                )
 
 
 
