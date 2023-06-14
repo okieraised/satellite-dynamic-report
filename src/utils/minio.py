@@ -6,14 +6,7 @@ from botocore.exceptions import ClientError
 
 from constants.constants import MINIO_ENDPOINT_URL, MINIO_ACCESS_KEY_ID, MINIO_SIGNATURE_VERSION, MINIO_REGION_NAME, \
     MINIO_SECRET_ACCESS_KEY, MINIO_BUCKET
-
-# MINIO_ENDPOINT_URL = os.getenv('MINIO_ENDPOINT_URL')
-# MINIO_ACCESS_KEY_ID = os.getenv('MINIO_ACCESS_KEY')
-# MINIO_SECRET_ACCESS_KEY = os.getenv('MINIO_SECRET_KEY')
-# MINIO_SIGNATURE_VERSION = os.getenv('MINIO_SIGNATURE_VERSION')
-# MINIO_REGION_NAME = os.getenv('MINIO_REGION_NAME')
-# MINIO_BUCKET = os.getenv('MINIO_BUCKET')
-# MINIO_PUBLIC_ENDPOINT_URL = os.getenv('MINIO_PUBLIC_ENDPOINT_URL', '')
+from utils.datetime_utils import get_week_number
 
 
 class Minio:
@@ -110,16 +103,25 @@ Minio_Object = Minio()
 if __name__ == "__main__":
     # print("MINIO_BUCKET", MINIO_BUCKET)
     # Minio_Object.minio_head_bucket(MINIO_BUCKET)
-    resp = Minio_Object.minio_list_objects(MINIO_BUCKET, prefix='shapefile')
+    resp = Minio_Object.minio_list_objects(MINIO_BUCKET, prefix='evi/housel/')
     print(resp)
+
+    res = [i['Key'] for i in resp]
+
+    print(res)
+
+    print(str(resp[0]['Key']).split('evi/housel/')[1].split('.')[0].split('-'))
+
+    date = str(resp[0]['Key']).split('evi/housel/')[1].split('.')[0].split('-')
+
+    print("int(date[1])", int(date[1]))
+
+    print(get_week_number(int(date[0]), int(date[1]), int(date[2])))
 
 
     # raw = Minio_Object.minio_get("/shapefile/housel/Housel_v2.shp")
     #
     # print("raw", raw)
-    # new = raw.hex()
-    # print(new)
-    #
     # import json
     # import codecs
     # import geopandas as gpd

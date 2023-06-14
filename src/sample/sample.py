@@ -23,7 +23,7 @@ mapbox_url = "https://api.mapbox.com/styles/v1/mapbox/{id}/tiles/{{z}}/{{x}}/{{y
 xx = aw_img.getbuffer()
 print(xx)
 # url=mapbox_url.format(id="satellite-streets-v10", access_token=mapbox_access_token) heatmap-container
-url = 'http://localhost:9000/dynamic-data/evi/housel/2022-07-30-2.tif'
+url = 'http://localhost:9000/dynamic-data/evi/housel/2022-07-30.tif'
 app.layout = html.Div([
             dcc.Location(id="url", refresh=True),
             dl.Map([dl.TileLayer(),

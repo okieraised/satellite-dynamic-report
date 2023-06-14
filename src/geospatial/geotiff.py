@@ -63,6 +63,10 @@ class GeoTiffObject(object):
     def __init__(self, url: str):
         self.url = url
 
+    def read(self):
+        return
+
+
 
 
 
@@ -81,15 +85,15 @@ if __name__ == "__main__":
 
     dst_crs = "EPSG:4326"
 
-    with rio.open('../data/tiff/2022-07-30-2.tif') as src:
-        elevation = src.read(1)
-        print(elevation)
-
-        array = src.read()
-        print(array.shape)
-        print("src", array.max())
-
-        px_vals = []
+    # with rio.open('../data/tiff/2022-07-30-2.tif') as src:
+    #     elevation = src.read(1)
+    #     print(elevation)
+    #
+    #     array = src.read()
+    #     print(array.shape)
+    #     print("src", array.max())
+    #
+    #     px_vals = []
 
         # for x in range(elevation.shape[0]):
         #     for y in range(elevation.shape[1]):
@@ -103,6 +107,55 @@ if __name__ == "__main__":
         #
         # print()
 
+    from os import listdir
+    from os.path import isfile, join
+
+    mypath = '/Users/tripham/Documents/sample_sat/Housel_VIs'
+    outpath = '/Users/tripham/Documents/sample_sat/Housel_VIs2'
+
+    onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
+
+    print(onlyfiles)
+
+    for f in onlyfiles:
+        with rio.open(join(mypath, f)) as src:
+            print("process", join(mypath, f))
+            elevation = src.read(1)
+
+            src_transform = src.transform
+
+            # calculate the transform matrix for the output
+            dst_transform, width, height = calculate_default_transform(
+                src.crs,
+                dst_crs,
+                src.width,
+                src.height,
+                *src.bounds,  # unpacks outer boundaries (left, bottom, right, top)
+            )
+
+            # set properties for output
+            dst_kwargs = src.meta.copy()
+            dst_kwargs.update(
+                {
+                    "crs": dst_crs,
+                    "transform": dst_transform,
+                    "width": width,
+                    "height": height,
+                    "nodata": 0,  # replace 0 with np.nan
+                }
+            )
+
+            with rio.open(join(outpath, f), "w", **dst_kwargs) as dst:
+                for i in range(1, src.count + 1):
+                    reproject(
+                        source=rio.band(src, i),
+                        destination=rio.band(dst, i),
+                        src_transform=src.transform,
+                        src_crs=src.crs,
+                        dst_transform=dst_transform,
+                        dst_crs=dst_crs,
+                        resampling=Resampling.nearest,
+                    )
 
 
     # with rio.open('../data/tiff/tz850.tiff') as src:
@@ -149,13 +202,3 @@ if __name__ == "__main__":
     #                 dst_crs=dst_crs,
     #                 resampling=Resampling.nearest,
     #             )
-    #
-    #
-    #
-    #     # fig = px.imshow(elevation)
-    #     # my_layout = dict(title_text='Big Tujunga Cachement-California', title_x=0.5, width=700, height=500,
-    #     #                  template='none',
-    #     #                  coloraxis_colorbar=dict(len=0.75, thickness=25))
-    #     # fig.update_layout(**my_layout)
-    #     #
-    #     # fig.show()

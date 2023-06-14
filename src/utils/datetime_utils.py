@@ -14,7 +14,7 @@ def get_current_week_number() -> int:
 
 
 if __name__ == "__main__":
-    get_week_number(2023, 6, 5)
+    print(get_week_number(2000, 1, 1))
     get_current_week_number()
 
 
