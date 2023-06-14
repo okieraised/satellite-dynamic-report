@@ -1,5 +1,6 @@
 import dash
 from dash import Dash, dcc, html, Input, Output
+import dash_leaflet as dl
 
 import plotly.express as px
 import plotly.graph_objects as go
@@ -7,17 +8,66 @@ import geopandas as gpd
 import os
 import pandas as pd
 
-from constants.constants import MAPBOX_API_KEY, OK_LONG, OK_LAT, YEARS, MapType, OH_LAT, OH_LONG
+from constants.constants import MAPBOX_API_KEY, OK_LONG, OK_LAT, YEARS, MapType, OH_LAT, OH_LONG, BASEMAP_URL, \
+    MINIO_BUCKET, DEFAULT_DATA, DEFAULT_SITE, CURRENT_YEAR
+from geospatial.geotiff import GeoTiffObject
 from geospatial.shapefile import default_geojson_data
 from layout.default_layout import default_data, generate_default_time_series_fig
-from layout.layout import map_layout, slider_layout, generate_title_layout, graph_layout_1, graph_layout_2, \
-    generate_time_series_graph_by_site
+from layout.layout import slider_layout, generate_title_layout, graph_layout_1, graph_layout_2, \
+    generate_time_series_graph_by_site, render_basemap
 import dash_bootstrap_components as dbc
 
 from time_series.time_series import query_time_series_data, VariableMapper
+from utils.datetime_utils import get_week_number
 from utils.logging import logger
+from utils.minio import Minio_Object
 
 csv_data = query_time_series_data()
+# prefix = f'{DEFAULT_DATA}/{DEFAULT_SITE}/'.lower()
+
+
+def get_obj_path(data_type: str, site_name: str) -> list:
+    prefix = f'{data_type}/{site_name}/'.lower()
+    default_data_paths = Minio_Object.minio_list_objects(MINIO_BUCKET, prefix=prefix)
+    objs = [i['Key'] for i in default_data_paths]
+    logger.info(f"got {len(objs)} objects")
+    return objs
+
+
+def map_data_path_to_week(data_type: str, site_name: str, year: int) -> dict:
+    prefix = f'{data_type}/{site_name}/'.lower()
+
+    res = dict()
+    objs = get_obj_path(data_type=data_type, site_name=site_name)
+
+    if len(objs) > 0:
+        file_paths = [i.split(prefix)[1] for i in objs]
+        for f_path in file_paths:
+            try:
+                base = str(f_path).split('.')[0]
+                time_component = base.split('-')
+                d_year = int(time_component[0])
+                d_month = int(time_component[1])
+                d_day = int(time_component[2])
+
+                if d_year != year:
+                    continue
+
+                week_number = get_week_number(d_year, d_month, d_day)
+                res.update({week_number: f_path})
+
+            except Exception as err:
+                logger.error(f"{err}")
+                continue
+
+    logger.debug(f"data: {res}")
+
+    return res
+
+
+
+
+
 
 
 app = dash.Dash(
@@ -42,7 +92,7 @@ app.layout = html.Div(
             children=[
                 html.Div(
                     id="left-column",
-                    children=[slider_layout, map_layout],
+                    children=[slider_layout, render_basemap(map_type=MapType.DEFAULT)],
                 ),
                 html.Div(
                     id="graph-container",
@@ -65,27 +115,65 @@ app.layout = html.Div(
 ########################################################################################################################
 
 @app.callback(
-    Output(component_id='heatmap-container', component_property='figure'),
-    Input(component_id='basemap-dropdown', component_property='value')
+    [
+        Output(component_id='heatmap-container', component_property='children'),
+    ],
+    [
+        Input(component_id="slider", component_property="value"),
+        Input(component_id="data-type-dropdown", component_property="value"),
+        Input(component_id="week-dropdown", component_property="value"),
+        Input(component_id="site-dropdown", component_property="value"),
+        Input(component_id='basemap-dropdown', component_property='value')
+
+    ],
+    prevent_initial_call=True
 )
-def update_basemap(input_map_value):
+def update_basemap(year: int, data_type: str, week_number: int, site_name: str, input_map_style):
 
-    logger.info(f"input_map_value: {input_map_value}")
+    logger.info(f"year: {year} | data_type: {data_type} | week_number: {week_number} | site_name: {site_name} | "
+                f"input_map_value: {input_map_style}")
 
-    map_figure = dict(
-        data=[default_data()],
-        layout=go.Layout(
-            autosize=True,
-            mapbox=dict(
-                accesstoken=MAPBOX_API_KEY,
-                zoom=6,
-                center=dict(lat=OH_LAT, lon=OH_LONG),
-                style=input_map_value,
-                layers=default_geojson_data(),
-            ),
-            margin=dict(l=0, r=0, t=0, b=0),
-        )
-    )
+    map_figure = [dl.TileLayer(url=BASEMAP_URL.format(map_style=input_map_style, access_token=MAPBOX_API_KEY))]
+
+    data_mapper = map_data_path_to_week(data_type=data_type, site_name=site_name, year=year)
+
+    file_name = data_mapper.get(week_number)
+
+    if file_name:
+        prefix = f'{data_type}/{site_name}/'.lower()
+        obj_path = ''.join([prefix, file_name])
+        logger.info(f"rendering object {obj_path}")
+
+        tif_data = GeoTiffObject(obj_path)
+        tif_url = tif_data.gen_url()
+        tif_color_scale = tif_data.generate_color_scheme()
+        logger.info(f"geotiff url: {tif_url}")
+        logger.info(f"geotiff max_pix: {tif_data.max_pix()} | geotiff min_pix: {tif_data.min_pix()} ")
+
+        # map_figure = [
+        #     dl.TileLayer(url=BASEMAP_URL.format(map_style=input_map_style, access_token=MAPBOX_API_KEY)),
+        #     dl.GeoTIFFOverlay(id="raster", interactive=True, url=tif_url, band=0, opacity=0.5, **tif_color_scale),
+        #     dl.Colorbar(width=200, height=20, min=tif_color_scale.get('domainMin'),
+        #                 max=tif_color_scale.get('domainMax'),
+        #                 position="topleft",
+        #                 tickDecimals=2, unit=" ",
+        #                 colorscale=tif_color_scale.get('colorscale'),
+        #                 style={"color": tif_color_scale.get('colorscale')[0]})
+        # ]
+
+        map_figure = [
+            dl.Map(children=[
+                dl.TileLayer(url=BASEMAP_URL.format(map_style=input_map_style, access_token=MAPBOX_API_KEY)),
+                dl.GeoTIFFOverlay(id="raster", interactive=True, url=tif_url, band=0, opacity=0.5, **tif_color_scale),
+                dl.Colorbar(width=200, height=20, min=tif_color_scale.get('domainMin'),
+                            max=tif_color_scale.get('domainMax'),
+                            position="topleft",
+                            tickDecimals=2, unit=" ",
+                            colorscale=tif_color_scale.get('colorscale'),
+                            style={"color": tif_color_scale.get('colorscale')[0]})
+            ],
+                center=tif_data.center)
+        ]
 
     return map_figure
 
@@ -165,6 +253,8 @@ def update_time_series_graph(variable_input, site_input):
 
 
 if __name__ == "__main__":
+    # get_obj_path(data_type=DEFAULT_DATA, site_name=DEFAULT_SITE)
+    # map_data_path_to_week(data_type=DEFAULT_DATA, site_name=DEFAULT_SITE, year=2015)
     app.run_server(debug=True, port=18050, processes=1, threaded=True)
 
 

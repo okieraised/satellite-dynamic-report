@@ -1,11 +1,7 @@
 import io
 import os.path
-
 import numpy as np
-import plotly.graph_objs as go
 import rasterio as rio
-import plotly.express as px
-from matplotlib.colors import LightSource
 
 from rasterio.coords import BoundingBox
 from rasterio import windows
@@ -16,7 +12,7 @@ from rasterio.warp import reproject, Resampling, calculate_default_transform
 import geopandas as gpd
 
 import utils.logging
-from constants.constants import MINIO_ENDPOINT_URL
+from constants.constants import MINIO_ENDPOINT_URL, MINIO_BUCKET
 from utils.datetime_utils import get_week_number
 from utils.logging import logger
 from utils.minio import Minio_Object
@@ -24,26 +20,43 @@ from utils.minio import Minio_Object
 
 class GeoTiffObject(object):
 
-    def __init__(self, obj: str, logger: utils.logging.logger):
+    def __init__(self, obj: str):
         self.obj = obj
         self.logger = logger
-        self.data = self.get_data()
+        self.data = self.get_minio_data()
         self.pixels = []
         self.crs = "EPSG:4326"
+        self.center = (0, 0)
 
     def gen_url(self) -> str:
-        url = "/".join([MINIO_ENDPOINT_URL, self.obj])
+        url = "/".join([MINIO_ENDPOINT_URL, MINIO_BUCKET, self.obj])
         return url
 
-    def get_data(self):
+    def get_minio_data(self):
         try:
             img_raw = Minio_Object.minio_get(self.obj)
             img_bytes = io.BytesIO(img_raw)
             with rio.open(img_bytes) as src:
+                self.center = src.xy(src.height // 2, src.width // 2)
                 return src.read(1)
+
         except Exception as err:
             logger.error(f"{err}")
-            return []
+            return None
+
+    def read_data(self):
+        try:
+            img_bytes = self.get_minio_data()
+            if img_bytes:
+                with rio.open(img_bytes) as src:
+                    center = src.xy(src.height // 2, src.width // 2)
+                    return src.read(1), center
+
+            return [], (0, 0)
+        except Exception as err:
+            logger.error(f"{err}")
+            return [], (0, 0)
+
 
     def get_pixels(self):
         px_vals = []
@@ -67,7 +80,7 @@ class GeoTiffObject(object):
 
     def max_pix(self) -> float:
         try:
-            max_pix = self.data.min()
+            max_pix = self.data.max()
             return max_pix
         except Exception as err:
             logger.error(f"{err}")
@@ -99,16 +112,15 @@ class GeoTiffObject(object):
                            np.max(self.data[:, 0]),
                            np.max(self.data[:, 1]))
 
-    def x(self):
-        return
-
 
 if __name__ == "__main__":
-    tif = GeoTiffObject('vi/housel/2000-01-01.tif', logger=logger)
+    tif = GeoTiffObject('vi/housel/2000-01-01.tif')
     print(tif.gen_url())
     print(tif.get_pixels())
     print(tif.get_current_week())
     print(tif.get_bounding_box())
+    print(tif.get_minio_data())
+
 
 
 

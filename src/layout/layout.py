@@ -2,7 +2,9 @@ import dash_bootstrap_components as dbc
 import plotly.graph_objs as go
 
 from dash import dcc, html
-from constants.constants import YEARS, DropdownMapper, MapType, Site, MAPBOX_API_KEY, OH_LONG, OH_LAT, DEFAULT_SITE
+import dash_leaflet as dl
+from constants.constants import YEARS, DropdownMapper, MapType, Site, MAPBOX_API_KEY, OH_LONG, OH_LAT, DEFAULT_SITE, \
+    OK_LAT, OK_LONG, BASEMAP_URL, DEFAULT_DATA
 from geospatial.shapefile import default_geojson_data
 from layout.default_layout import default_data
 from time_series.time_series import read_csv, VariableMapper
@@ -32,7 +34,6 @@ def generate_title_layout() -> html.Div:
 
 
 def generate_map_dropdown_menu(dropdown_id: str, options: any, value: any) -> html.Div:
-
     dropdown = html.Div(
         [
             dcc.Dropdown(options=options, value=value, id=dropdown_id)
@@ -44,28 +45,19 @@ def generate_map_dropdown_menu(dropdown_id: str, options: any, value: any) -> ht
     return dropdown
 
 
-map_layout = dcc.Graph(
-    id='heatmap-container',
-    style={'marginLeft': '0px',
-           'marginRight': '0px',
-           'margin-top': '10px',
-           'margin-bottom': '0px'},
-    figure=dict(
-        data=[default_data()],
-        layout=go.Layout(
-            autosize=True,
-            mapbox=dict(
-                accesstoken=MAPBOX_API_KEY,
-                zoom=6,
-                center=dict(lat=OH_LAT, lon=OH_LONG),
-                style=MapType.DEFAULT,
-                layers=default_geojson_data(),
-            ),
-            margin=dict(l=0, r=0, t=0, b=0),
-        )
-    ),
-    config=dict(responsive=True, displayModeBar=False)
-)
+def render_basemap(map_type: str) -> dl.Map:
+    map_layout = dl.Map(
+        id='heatmap-container',
+        style={'marginLeft': '0px',
+               'marginRight': '0px',
+               'margin-top': '10px',
+               'margin-bottom': '0px'},
+        children=[dl.TileLayer(url=BASEMAP_URL.format(map_style=map_type, access_token=MAPBOX_API_KEY))],
+        zoom=6,
+        center=(OH_LAT, OH_LONG),
+    )
+
+    return map_layout
 
 
 slider_layout = html.Div(
@@ -73,9 +65,9 @@ slider_layout = html.Div(
     children=[
         html.Div(
             [
-                generate_map_dropdown_menu(dropdown_id="data-dropdown-1",
+                generate_map_dropdown_menu(dropdown_id="data-type-dropdown",
                                            options=DropdownMapper.SatelliteData,
-                                           value="EVI"),
+                                           value=DEFAULT_DATA),
                 generate_map_dropdown_menu(dropdown_id="basemap-dropdown",
                                            options=DropdownMapper.WorldMap,
                                            value=MapType.DEFAULT),
@@ -151,8 +143,7 @@ graph_layout_2 = dcc.Graph(
 )
 
 
-def generate_time_series_graph_by_site(dropdown_id: str, graph_id: str, data: dict, site_name: Site=DEFAULT_SITE):
-
+def generate_time_series_graph_by_site(dropdown_id: str, graph_id: str, data: dict, site_name: Site = DEFAULT_SITE):
     # Init variables
     dropdown_options = {}
     dropdown_value = list(VariableMapper.keys())[0]
@@ -210,4 +201,3 @@ def generate_time_series_graph_by_site(dropdown_id: str, graph_id: str, data: di
     )
 
     return graph_layout
-
