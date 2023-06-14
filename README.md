@@ -54,6 +54,44 @@
   - If we have 2 sites with available NDVI data, we must organize the NDVI by site name
 - File names of the GeoTiff must be of format yyyy-mm-dd.tif (e.g. 2023-06-01.tiff) 
 - The name of the directories must be of lowercase, without space between each word of the directory name
+- Due to constraints in current mapping library, a custom access policy must be set for the MinIO bucket, 
+paste this into the `Access Policy` section with `custom` option specified:
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": [
+                    "*"
+                ]
+            },
+            "Action": [
+                "s3:GetBucketLocation",
+                "s3:ListBucket"
+            ],
+            "Resource": [
+                "arn:aws:s3:::dynamic-data"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": [
+                    "*"
+                ]
+            },
+            "Action": [
+                "s3:GetObject"
+            ],
+            "Resource": [
+                "arn:aws:s3:::dynamic-data/*"
+            ]
+        }
+    ]
+}
+```
 
 ## III. Running the app
 The app is run on port 18050
