@@ -23,10 +23,10 @@ class GeoTiffObject(object):
     def __init__(self, obj: str):
         self.obj = obj
         self.logger = logger
-        self.data = self.get_minio_data()
+        self.data = self.get_minio_data()[0]
         self.pixels = []
         self.crs = "EPSG:4326"
-        self.center = (0, 0)
+        self.center = self.get_minio_data()[1]
 
     def gen_url(self) -> str:
         url = "/".join([MINIO_ENDPOINT_URL, MINIO_BUCKET, self.obj])
@@ -37,22 +37,9 @@ class GeoTiffObject(object):
             img_raw = Minio_Object.minio_get(self.obj)
             img_bytes = io.BytesIO(img_raw)
             with rio.open(img_bytes) as src:
-                self.center = src.xy(src.height // 2, src.width // 2)
-                return src.read(1)
+                center = src.xy(src.height // 2, src.width // 2)
+                return src.read(1), (center[1], center[0])
 
-        except Exception as err:
-            logger.error(f"{err}")
-            return None
-
-    def read_data(self):
-        try:
-            img_bytes = self.get_minio_data()
-            if img_bytes:
-                with rio.open(img_bytes) as src:
-                    center = src.xy(src.height // 2, src.width // 2)
-                    return src.read(1), center
-
-            return [], (0, 0)
         except Exception as err:
             logger.error(f"{err}")
             return [], (0, 0)

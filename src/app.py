@@ -148,18 +148,8 @@ def update_basemap(year: int, data_type: str, week_number: int, site_name: str, 
         tif_url = tif_data.gen_url()
         tif_color_scale = tif_data.generate_color_scheme()
         logger.info(f"geotiff url: {tif_url}")
-        logger.info(f"geotiff max_pix: {tif_data.max_pix()} | geotiff min_pix: {tif_data.min_pix()} ")
-
-        # map_figure = [
-        #     dl.TileLayer(url=BASEMAP_URL.format(map_style=input_map_style, access_token=MAPBOX_API_KEY)),
-        #     dl.GeoTIFFOverlay(id="raster", interactive=True, url=tif_url, band=0, opacity=0.5, **tif_color_scale),
-        #     dl.Colorbar(width=200, height=20, min=tif_color_scale.get('domainMin'),
-        #                 max=tif_color_scale.get('domainMax'),
-        #                 position="topleft",
-        #                 tickDecimals=2, unit=" ",
-        #                 colorscale=tif_color_scale.get('colorscale'),
-        #                 style={"color": tif_color_scale.get('colorscale')[0]})
-        # ]
+        logger.info(f"geotiff max_pix: {tif_data.max_pix()} | geotiff min_pix: {tif_data.min_pix()} | "
+                    f"geotiff center: {tif_data.center}")
 
         map_figure = [
             dl.Map(children=[
@@ -167,12 +157,12 @@ def update_basemap(year: int, data_type: str, week_number: int, site_name: str, 
                 dl.GeoTIFFOverlay(id="raster", interactive=True, url=tif_url, band=0, opacity=0.5, **tif_color_scale),
                 dl.Colorbar(width=200, height=20, min=tif_color_scale.get('domainMin'),
                             max=tif_color_scale.get('domainMax'),
-                            position="topleft",
+                            position="bottomleft",
                             tickDecimals=2, unit=" ",
                             colorscale=tif_color_scale.get('colorscale'),
                             style={"color": tif_color_scale.get('colorscale')[0]})
             ],
-                center=tif_data.center)
+                center=tif_data.center, zoom=13)
         ]
 
     return map_figure
