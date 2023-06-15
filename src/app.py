@@ -65,11 +65,6 @@ def map_data_path_to_week(data_type: str, site_name: str, year: int) -> dict:
     return res
 
 
-
-
-
-
-
 app = dash.Dash(
         __name__,
         meta_tags=[
@@ -79,6 +74,7 @@ app = dash.Dash(
             }
         ],
         title="Dynamic Report",
+        suppress_callback_exceptions=True,
     )
 
 server = app.server
@@ -108,6 +104,8 @@ app.layout = html.Div(
         ),
     ]
 )
+
+
 
 
 ########################################################################################################################
@@ -179,15 +177,25 @@ def update_basemap(year: int, data_type: str, week_number: int, site_name: str, 
         Output(component_id="app-container", component_property="children")
     ],
     [
-        Input(component_id="heatmap-container", component_property='click_lat_lng')
+        Input(component_id="raster", component_property='click_lat_lng_val')
     ],
-    allow_duplicate=True
+    allow_duplicate=True,
 )
 def show_pixel(click_lat_lng):
-    if not click_lat_lng:
+    try:
+        if not click_lat_lng:
+            raise dash.exceptions.PreventUpdate("cancel the callback")
+
+        lat = click_lat_lng[0]
+        long = click_lat_lng[1]
+        value = click_lat_lng[2]
+
+        print(lat, long, val)
         raise dash.exceptions.PreventUpdate("cancel the callback")
-    print(click_lat_lng[0], click_lat_lng[1])
-    raise dash.exceptions.PreventUpdate("cancel the callback")
+    except Exception as err:
+        logger.error(f"{err}")
+        raise dash.exceptions.PreventUpdate("cancel the callback")
+
 
 
 @app.callback(
@@ -265,8 +273,6 @@ def update_time_series_graph(variable_input, site_input):
 
 
 if __name__ == "__main__":
-    # get_obj_path(data_type=DEFAULT_DATA, site_name=DEFAULT_SITE)
-    # map_data_path_to_week(data_type=DEFAULT_DATA, site_name=DEFAULT_SITE, year=2015)
     app.run_server(debug=True, port=18050, processes=1, threaded=True)
 
 
