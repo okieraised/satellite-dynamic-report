@@ -135,37 +135,59 @@ def update_basemap(year: int, data_type: str, week_number: int, site_name: str, 
 
     map_figure = [dl.TileLayer(url=BASEMAP_URL.format(map_style=input_map_style, access_token=MAPBOX_API_KEY))]
 
-    data_mapper = map_data_path_to_week(data_type=data_type, site_name=site_name, year=year)
+    try:
+        data_mapper = map_data_path_to_week(data_type=data_type, site_name=site_name, year=year)
 
-    file_name = data_mapper.get(week_number)
+        file_name = data_mapper.get(week_number)
 
-    if file_name:
-        prefix = f'{data_type}/{site_name}/'.lower()
-        obj_path = ''.join([prefix, file_name])
-        logger.info(f"rendering object {obj_path}")
+        if file_name:
+            prefix = f'{data_type}/{site_name}/'.lower()
+            obj_path = ''.join([prefix, file_name])
+            logger.info(f"rendering object {obj_path}")
 
-        tif_data = GeoTiffObject(obj_path)
-        tif_url = tif_data.gen_url()
-        tif_color_scale = tif_data.generate_color_scheme()
-        logger.info(f"geotiff url: {tif_url}")
-        logger.info(f"geotiff max_pix: {tif_data.max_pix()} | geotiff min_pix: {tif_data.min_pix()} | "
-                    f"geotiff center: {tif_data.center}")
+            tif_data = GeoTiffObject(obj_path)
+            tif_url = tif_data.gen_url()
+            tif_color_scale = tif_data.generate_color_scheme()
+            logger.info(f"geotiff url: {tif_url}")
+            logger.info(f"geotiff max_pix: {tif_data.max_pix()} | geotiff min_pix: {tif_data.min_pix()} | "
+                        f"geotiff center: {tif_data.center}")
 
-        map_figure = [
-            dl.Map(children=[
-                dl.TileLayer(url=BASEMAP_URL.format(map_style=input_map_style, access_token=MAPBOX_API_KEY)),
-                dl.GeoTIFFOverlay(id="raster", interactive=True, url=tif_url, band=0, opacity=0.5, **tif_color_scale),
-                dl.Colorbar(width=200, height=20, min=tif_color_scale.get('domainMin'),
-                            max=tif_color_scale.get('domainMax'),
-                            position="bottomleft",
-                            tickDecimals=2, unit=" ",
-                            colorscale=tif_color_scale.get('colorscale'),
-                            style={"color": tif_color_scale.get('colorscale')[0]})
-            ],
-                center=tif_data.center, zoom=13)
-        ]
+            map_figure = [
+                dl.Map(children=[
+                    dl.TileLayer(url=BASEMAP_URL.format(map_style=input_map_style, access_token=MAPBOX_API_KEY)),
+                    dl.GeoTIFFOverlay(id="raster", interactive=True, url=tif_url, band=0, opacity=0.5,
+                                      **tif_color_scale),
+                    dl.Colorbar(width=200, height=20, min=tif_color_scale.get('domainMin'),
+                                max=tif_color_scale.get('domainMax'),
+                                position="bottomleft",
+                                tickDecimals=2, unit=" ",
+                                colorscale=tif_color_scale.get('colorscale'),
+                                style={"color": tif_color_scale.get('colorscale')[0]})
+                ],
+                    center=tif_data.center, zoom=13)
+            ]
 
-    return map_figure
+        return map_figure
+
+    except Exception as err:
+        logger.error(f"{err}")
+        return map_figure
+
+
+@app.callback(
+    [
+        Output(component_id="app-container", component_property="children")
+    ],
+    [
+        Input(component_id="heatmap-container", component_property='click_lat_lng')
+    ],
+    allow_duplicate=True
+)
+def show_pixel(click_lat_lng):
+    if not click_lat_lng:
+        raise dash.exceptions.PreventUpdate("cancel the callback")
+    print(click_lat_lng[0], click_lat_lng[1])
+    raise dash.exceptions.PreventUpdate("cancel the callback")
 
 
 @app.callback(
