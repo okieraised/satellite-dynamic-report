@@ -190,7 +190,7 @@ def show_pixel(click_lat_lng):
         long = click_lat_lng[1]
         value = click_lat_lng[2]
 
-        print(lat, long, val)
+        print(lat, long, value)
         raise dash.exceptions.PreventUpdate("cancel the callback")
     except Exception as err:
         logger.error(f"{err}")
