@@ -13,58 +13,20 @@ from constants.constants import MAPBOX_API_KEY, OK_LONG, OK_LAT, YEARS, MapType,
 from geospatial.geotiff import GeoTiffObject
 from geospatial.shapefile import default_geojson_data
 from layout.default_layout import default_data, generate_default_time_series_fig
-from layout.layout import slider_layout, generate_title_layout, graph_layout_2, \
+from layout.layout import slider_layout, generate_title_layout, \
     generate_time_series_graph_by_site, render_basemap, generate_default_histogram_graph, \
-    generate_default_histogram_layout
+    generate_default_graph_layout, generate_aggregate_graph, generate_aggregate_figure
 import dash_bootstrap_components as dbc
 
 from time_series.time_series import query_time_series_data, VariableMapper
 from utils.datetime_utils import get_week_number
 from utils.logging import logger
 from utils.minio import Minio_Object
-from utils.query_data import map_data_path_to_week
+from utils.query_data import map_data_path_to_week, get_aggregate_of_data
 
 csv_data = query_time_series_data()
-# prefix = f'{DEFAULT_DATA}/{DEFAULT_SITE}/'.lower()
+default_df = get_aggregate_of_data(data_type=DEFAULT_DATA, site_name=DEFAULT_SITE)
 
-
-# def get_obj_path(data_type: str, site_name: str) -> list:
-#     prefix = f'{data_type}/{site_name}/'.lower()
-#     default_data_paths = Minio_Object.minio_list_objects(MINIO_BUCKET, prefix=prefix)
-#     objs = [i['Key'] for i in default_data_paths]
-#     logger.info(f"got {len(objs)} objects")
-#     return objs
-#
-#
-# def map_data_path_to_week(data_type: str, site_name: str, year: int) -> dict:
-#     prefix = f'{data_type}/{site_name}/'.lower()
-#
-#     res = dict()
-#     objs = get_obj_path(data_type=data_type, site_name=site_name)
-#
-#     if len(objs) > 0:
-#         file_paths = [i.split(prefix)[1] for i in objs]
-#         for f_path in file_paths:
-#             try:
-#                 base = str(f_path).split('.')[0]
-#                 time_component = base.split('-')
-#                 d_year = int(time_component[0])
-#                 d_month = int(time_component[1])
-#                 d_day = int(time_component[2])
-#
-#                 if d_year != year:
-#                     continue
-#
-#                 week_number = get_week_number(d_year, d_month, d_day)
-#                 res.update({week_number: f_path})
-#
-#             except Exception as err:
-#                 logger.error(f"{err}")
-#                 continue
-#
-#     logger.debug(f"data: {res}")
-#
-#     return res
 
 
 app = dash.Dash(
@@ -95,7 +57,7 @@ app.layout = html.Div(
                 ),
                 html.Div(
                     id="graph-container",
-                    children=[generate_default_histogram_graph(), graph_layout_2],
+                    children=[generate_default_histogram_graph(), generate_aggregate_graph(data=default_df)],
                 ),
             ]
         ),
@@ -137,7 +99,7 @@ def update_basemap(year: int, data_type: str, week_number: int, site_name: str, 
 
     map_figure = [dl.TileLayer(url=BASEMAP_URL.format(map_style=input_map_style, access_token=MAPBOX_API_KEY))]
 
-    default_hist = generate_default_histogram_layout()
+    default_hist = generate_default_graph_layout()
 
     try:
         data_mapper = map_data_path_to_week(data_type=data_type, site_name=site_name, year=year)
@@ -211,6 +173,7 @@ def update_basemap(year: int, data_type: str, week_number: int, site_name: str, 
         Input(component_id="raster", component_property='click_lat_lng_val')
     ],
     allow_duplicate=True,
+    prevent_initial_call=True
 )
 def show_pixel(click_lat_lng):
     try:
@@ -238,6 +201,7 @@ def show_pixel(click_lat_lng):
         Input(component_id='data-dropdown-2', component_property='value'),
         Input(component_id='site-dropdown', component_property='value'),
     ],
+    allow_duplicate=True,
     prevent_initial_call=True
 )
 @app.callback(
@@ -249,6 +213,7 @@ def show_pixel(click_lat_lng):
         Input(component_id='data-dropdown-3', component_property='value'),
         Input(component_id='site-dropdown', component_property='value'),
     ],
+    allow_duplicate=True,
     prevent_initial_call=True
 )
 def update_time_series_graph(variable_input, site_input):
@@ -301,6 +266,31 @@ def update_time_series_graph(variable_input, site_input):
     except Exception as err:
         logger.error(f"{err}")
         return generate_default_time_series_fig(), []
+
+
+@app.callback(
+    [
+        Output(component_id='selected-data-2', component_property='figure')
+    ],
+    [
+        Input(component_id="data-type-dropdown", component_property="value"),
+        Input(component_id="site-dropdown", component_property="value"),
+
+    ],
+    prevent_initial_call=True,
+    allow_duplicate=True,
+)
+def update_aggregate_figure(data_type: str, site_name: str):
+    df = get_aggregate_of_data(data_type=data_type, site_name=site_name)
+    if not df.empty:
+        col_name = 'min'
+        data = [go.Scatter(x=df.index.tolist(), y=df[col_name].tolist())] #  for col_name in df.columns
+        return generate_aggregate_figure(data=data)
+
+
+
+
+
 
 
 if __name__ == "__main__":

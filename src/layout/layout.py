@@ -1,4 +1,5 @@
 import dash_bootstrap_components as dbc
+import pandas as pd
 import plotly.graph_objs as go
 
 from dash import dcc, html
@@ -9,6 +10,7 @@ from geospatial.shapefile import default_geojson_data
 from layout.default_layout import default_data
 from time_series.time_series import VariableMapper
 from utils.datetime_utils import get_current_week_number
+from utils.query_data import get_aggregate_of_data
 
 
 def generate_title_layout() -> html.Div:
@@ -104,45 +106,8 @@ slider_layout = html.Div(
 )
 
 
-def generate_default_histogram_layout() -> dict:
-
-    default_hist_layout = dict(
-            data=[go.Scatter(x=[], y=[])],
-            layout=dict(
-                paper_bgcolor="#1f2630",
-                plot_bgcolor="#1f2630",
-                font=dict(color="#2cfec1"),
-                autofill=True,
-                margin=dict(t=75, r=50, b=50, l=50),
-                title='N/A',
-                xaxis={
-                    'title': dict(
-                        text="N/A"
-                    )
-                },
-                yaxis={
-                    'title': dict(
-                        text="N/A"
-                    )
-                }
-            ),
-        )
-
-    return default_hist_layout
-
-
-def generate_default_histogram_graph() -> dcc.Graph:
-    graph_layout = dcc.Graph(
-        id="selected-data-1",
-        figure=generate_default_histogram_layout(),
-    )
-
-    return graph_layout
-
-
-graph_layout_2 = dcc.Graph(
-    id="selected-data-2",
-    figure=dict(
+def generate_default_graph_layout() -> dict:
+    default_layout = dict(
         data=[go.Scatter(x=[], y=[])],
         layout=dict(
             paper_bgcolor="#1f2630",
@@ -150,9 +115,72 @@ graph_layout_2 = dcc.Graph(
             font=dict(color="#2cfec1"),
             autofill=True,
             margin=dict(t=75, r=50, b=50, l=50),
+            title='N/A',
+            xaxis={
+                'title': dict(
+                    text="N/A"
+                )
+            },
+            yaxis={
+                'title': dict(
+                    text="N/A"
+                )
+            }
         ),
-    ),
-)
+    )
+
+    return default_layout
+
+
+def generate_default_histogram_graph() -> dcc.Graph:
+    graph_layout = dcc.Graph(
+        id="selected-data-1",
+        figure=generate_default_graph_layout(),
+    )
+
+    return graph_layout
+
+
+def generate_aggregate_figure(data: list, xaxis: str = "N/A", yaxis: str = "N/A", title: str = "N/A"):
+
+    figure = dict(
+        data=data,
+        layout=dict(
+            paper_bgcolor="#1f2630",
+            plot_bgcolor="#1f2630",
+            font=dict(color="#2cfec1"),
+            autofill=True,
+            margin=dict(t=75, r=50, b=50, l=50),
+            title=title,
+            xaxis={
+                'title': dict(
+                    text=xaxis
+                )
+            },
+            yaxis={
+                'title': dict(
+                    text=yaxis
+                )
+            }
+        )
+    )
+
+    return figure
+
+
+def generate_aggregate_graph(data: pd.DataFrame):
+    if data.empty:
+        fig_data = [go.Scatter(x=[], y=[])]
+    else:
+        fig_data = [go.Scatter(x=data.index.tolist(), y=data[col_name].tolist(), name=col_name, mode="markers")
+                    for col_name in data.columns]
+
+    graph_layout = dcc.Graph(
+        id="selected-data-2",
+        figure=generate_aggregate_figure(data=fig_data)
+    )
+
+    return graph_layout
 
 
 def generate_time_series_graph_by_site(dropdown_id: str, graph_id: str, data: dict, site_name: Site = DEFAULT_SITE):

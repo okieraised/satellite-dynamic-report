@@ -1,7 +1,10 @@
-from constants.constants import MINIO_BUCKET
-from utils.datetime_utils import get_week_number
+from constants.constants import MINIO_BUCKET, DataType, Site
+from geospatial.geotiff import GeoTiffObject
+from utils.datetime_utils import get_week_number, validate_file_format
 from utils.logging import logger
 from utils.minio import Minio_Object
+
+import pandas as pd
 
 
 def get_obj_path(data_type: str, site_name: str) -> list:
@@ -10,6 +13,46 @@ def get_obj_path(data_type: str, site_name: str) -> list:
     objs = [i['Key'] for i in default_data_paths]
     logger.info(f"got {len(objs)} objects")
     return objs
+
+
+def get_aggregate_of_data(data_type: str, site_name: str):
+
+    res = dict(date=[], min=[], max=[], avg=[])
+
+    prefix = f'{data_type}/{site_name}/'.lower()
+    o_paths = get_obj_path(data_type=data_type, site_name=site_name)
+
+    if len(o_paths) > 0:
+        for o_path in o_paths:
+            f_path = o_path.split(prefix)[1]
+            try:
+                d_date = str(f_path).split('.')[0]
+                if not validate_file_format(d_date):
+                    continue
+
+                tif_data = GeoTiffObject(o_path)
+                max_pix = tif_data.max_pix()
+                min_pix = tif_data.min_pix()
+                avg_pix = tif_data.avg_pix()
+
+                res.get('date').append(d_date)
+                res.get('min').append(min_pix)
+                res.get('max').append(max_pix)
+                res.get('avg').append(avg_pix)
+
+            except Exception as err:
+                logger.error(f"{err}")
+                continue
+
+        try:
+            df = pd.DataFrame.from_dict(res)
+            df = df.set_index('date')
+            return df
+        except Exception as err:
+            logger.error(f"{err}")
+            return None
+
+    return None
 
 
 def map_data_path_to_week(data_type: str, site_name: str, year: int) -> dict:
@@ -41,3 +84,8 @@ def map_data_path_to_week(data_type: str, site_name: str, year: int) -> dict:
     logger.debug(f"data: {res}")
 
     return res
+
+
+if __name__ == "__main__":
+    objects = get_aggregate_of_data(DataType.EVI, Site.Housel)
+    print(objects)

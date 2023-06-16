@@ -1,4 +1,5 @@
 import io
+import itertools
 import os.path
 import numpy as np
 import rasterio as rio
@@ -63,6 +64,10 @@ class GeoTiffObject(object):
         except Exception as err:
             logger.error(f"{err}")
             return 0
+
+    def avg_pix(self) -> float:
+        merged = list(itertools.chain.from_iterable(self.data))
+        return sum(merged) / len(merged)
 
     def generate_color_scheme(self) -> dict:
 

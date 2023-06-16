@@ -14,6 +14,14 @@ def get_current_week_number() -> int:
     return get_week_number(today.year, today.month, today.day)
 
 
+def validate_file_format(date_text: str):
+    try:
+        datetime.date.fromisoformat(date_text)
+        return True
+    except ValueError:
+        return False
+
+
 if __name__ == "__main__":
     print(get_week_number(2000, 1, 1))
     get_current_week_number()
