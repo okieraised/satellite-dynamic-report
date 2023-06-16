@@ -24,12 +24,6 @@ VariableMapper = dict(
 )
 
 
-def read_csv():
-    df = pd.read_csv('/Users/tripham/Desktop/satellite-dynamic-report/src/data/csv/Housel_DD_Input.csv', index_col='Date')
-
-    return [df.index.tolist(), df['TA'].tolist(), df['SW'].tolist()]
-
-
 def query_time_series_data() -> dict:
 
     res = dict()
@@ -58,17 +52,11 @@ def query_time_series_data() -> dict:
             )
 
         except Exception as err:
-            print(f"error retrieving object: {err}")
+            logger.error(f"error retrieving object: {err}")
             continue
 
     return res
 
 
-def read_time_series_data():
-    return
-
-
 if __name__ == "__main__":
-    # read_csv()
-    # query_time_series_data()
-    print("here")
+    query_time_series_data()

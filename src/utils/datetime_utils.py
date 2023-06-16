@@ -17,7 +17,6 @@ def get_current_week_number() -> int:
 if __name__ == "__main__":
     print(get_week_number(2000, 1, 1))
     get_current_week_number()
-
     print(datetime.date(2000, 1, 1).strftime("%U"))
 
 

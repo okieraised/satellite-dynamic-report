@@ -1,4 +1,3 @@
-import os
 import boto3
 
 from botocore.client import Config
@@ -6,7 +5,6 @@ from botocore.exceptions import ClientError
 
 from constants.constants import MINIO_ENDPOINT_URL, MINIO_ACCESS_KEY_ID, MINIO_SIGNATURE_VERSION, MINIO_REGION_NAME, \
     MINIO_SECRET_ACCESS_KEY, MINIO_BUCKET
-from utils.datetime_utils import get_week_number
 
 
 class Minio:
@@ -101,44 +99,6 @@ class Minio:
 Minio_Object = Minio()
 
 if __name__ == "__main__":
-    # print("MINIO_BUCKET", MINIO_BUCKET)
-    # Minio_Object.minio_head_bucket(MINIO_BUCKET)
     resp = Minio_Object.minio_list_objects(MINIO_BUCKET, prefix='evi/housel/')
-    print(resp)
-
-    res = [i['Key'] for i in resp]
-
-    print(res)
-
-    print(str(resp[0]['Key']).split('evi/housel/')[1].split('.')[0].split('-'))
-
-    date = str(resp[0]['Key']).split('evi/housel/')[1].split('.')[0].split('-')
-
-    print("int(date[1])", int(date[1]))
-
-    print(get_week_number(int(date[0]), int(date[1]), int(date[2])))
-
-
-    # raw = Minio_Object.minio_get("/shapefile/housel/Housel_v2.shp")
-    #
-    # print("raw", raw)
-    # import json
-    # import codecs
-    # import geopandas as gpd
-    # import io
-    # import binascii
-    #
-    # raw_img = io.BytesIO(raw)
-    #
-    # with open("./output.shp", "wb") as f:
-    #     f.write(raw_img.getbuffer())
-    #
-    # print("raw_img", raw_img)
-    #
-    # data = gpd.read_file(raw_img, driver = 'GeoJSON')
-    #
-    # # data = json.loads(raw)
-    #
-    # print("data", data)
 
 

@@ -7,7 +7,7 @@ from constants.constants import YEARS, DropdownMapper, MapType, Site, MAPBOX_API
     OK_LAT, OK_LONG, BASEMAP_URL, DEFAULT_DATA
 from geospatial.shapefile import default_geojson_data
 from layout.default_layout import default_data
-from time_series.time_series import read_csv, VariableMapper
+from time_series.time_series import VariableMapper
 from utils.datetime_utils import get_current_week_number
 
 
@@ -143,7 +143,7 @@ def generate_default_histogram_graph() -> dcc.Graph:
 graph_layout_2 = dcc.Graph(
     id="selected-data-2",
     figure=dict(
-        data=[go.Scatter(x=read_csv()[0], y=read_csv()[2])],
+        data=[go.Scatter(x=[], y=[])],
         layout=dict(
             paper_bgcolor="#1f2630",
             plot_bgcolor="#1f2630",
