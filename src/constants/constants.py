@@ -25,6 +25,8 @@ OK_LONG = -97.508469
 OH_LAT = 40.367474
 OH_LONG = -82.996216
 
+DEFAULT_CRS = "EPSG:4326"
+
 
 class Site(object):
     Housel = "Housel"
@@ -104,4 +106,3 @@ class DropdownMapper(object):
 
 if __name__ == "__main__":
     x = [{"label": val, "value": val} for key, val in Site.__dict__.items() if not key.startswith('__')]
-    print(x)

@@ -103,30 +103,42 @@ slider_layout = html.Div(
     ],
 )
 
-graph_layout_1 = dcc.Graph(
-    id="selected-data-1",
-    figure=dict(
-        data=[go.Scatter(x=read_csv()[0], y=read_csv()[1])],
-        layout=dict(
-            paper_bgcolor="#1f2630",
-            plot_bgcolor="#1f2630",
-            font=dict(color="#2cfec1"),
-            autofill=True,
-            margin=dict(t=75, r=50, b=50, l=50),
-            title='Housel',
-            xaxis={
-                'title': dict(
-                    text="Year"
-                )
-            },
-            yaxis={
-                'title': dict(
-                    text="TA"
-                )
-            }
-        ),
-    ),
-)
+
+def generate_default_histogram_layout() -> dict:
+
+    default_hist_layout = dict(
+            data=[go.Scatter(x=[], y=[])],
+            layout=dict(
+                paper_bgcolor="#1f2630",
+                plot_bgcolor="#1f2630",
+                font=dict(color="#2cfec1"),
+                autofill=True,
+                margin=dict(t=75, r=50, b=50, l=50),
+                title='N/A',
+                xaxis={
+                    'title': dict(
+                        text="N/A"
+                    )
+                },
+                yaxis={
+                    'title': dict(
+                        text="N/A"
+                    )
+                }
+            ),
+        )
+
+    return default_hist_layout
+
+
+def generate_default_histogram_graph() -> dcc.Graph:
+    graph_layout = dcc.Graph(
+        id="selected-data-1",
+        figure=generate_default_histogram_layout(),
+    )
+
+    return graph_layout
+
 
 graph_layout_2 = dcc.Graph(
     id="selected-data-2",

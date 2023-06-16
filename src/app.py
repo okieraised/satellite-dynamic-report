@@ -13,56 +13,58 @@ from constants.constants import MAPBOX_API_KEY, OK_LONG, OK_LAT, YEARS, MapType,
 from geospatial.geotiff import GeoTiffObject
 from geospatial.shapefile import default_geojson_data
 from layout.default_layout import default_data, generate_default_time_series_fig
-from layout.layout import slider_layout, generate_title_layout, graph_layout_1, graph_layout_2, \
-    generate_time_series_graph_by_site, render_basemap
+from layout.layout import slider_layout, generate_title_layout, graph_layout_2, \
+    generate_time_series_graph_by_site, render_basemap, generate_default_histogram_graph, \
+    generate_default_histogram_layout
 import dash_bootstrap_components as dbc
 
 from time_series.time_series import query_time_series_data, VariableMapper
 from utils.datetime_utils import get_week_number
 from utils.logging import logger
 from utils.minio import Minio_Object
+from utils.query_data import map_data_path_to_week
 
 csv_data = query_time_series_data()
 # prefix = f'{DEFAULT_DATA}/{DEFAULT_SITE}/'.lower()
 
 
-def get_obj_path(data_type: str, site_name: str) -> list:
-    prefix = f'{data_type}/{site_name}/'.lower()
-    default_data_paths = Minio_Object.minio_list_objects(MINIO_BUCKET, prefix=prefix)
-    objs = [i['Key'] for i in default_data_paths]
-    logger.info(f"got {len(objs)} objects")
-    return objs
-
-
-def map_data_path_to_week(data_type: str, site_name: str, year: int) -> dict:
-    prefix = f'{data_type}/{site_name}/'.lower()
-
-    res = dict()
-    objs = get_obj_path(data_type=data_type, site_name=site_name)
-
-    if len(objs) > 0:
-        file_paths = [i.split(prefix)[1] for i in objs]
-        for f_path in file_paths:
-            try:
-                base = str(f_path).split('.')[0]
-                time_component = base.split('-')
-                d_year = int(time_component[0])
-                d_month = int(time_component[1])
-                d_day = int(time_component[2])
-
-                if d_year != year:
-                    continue
-
-                week_number = get_week_number(d_year, d_month, d_day)
-                res.update({week_number: f_path})
-
-            except Exception as err:
-                logger.error(f"{err}")
-                continue
-
-    logger.debug(f"data: {res}")
-
-    return res
+# def get_obj_path(data_type: str, site_name: str) -> list:
+#     prefix = f'{data_type}/{site_name}/'.lower()
+#     default_data_paths = Minio_Object.minio_list_objects(MINIO_BUCKET, prefix=prefix)
+#     objs = [i['Key'] for i in default_data_paths]
+#     logger.info(f"got {len(objs)} objects")
+#     return objs
+#
+#
+# def map_data_path_to_week(data_type: str, site_name: str, year: int) -> dict:
+#     prefix = f'{data_type}/{site_name}/'.lower()
+#
+#     res = dict()
+#     objs = get_obj_path(data_type=data_type, site_name=site_name)
+#
+#     if len(objs) > 0:
+#         file_paths = [i.split(prefix)[1] for i in objs]
+#         for f_path in file_paths:
+#             try:
+#                 base = str(f_path).split('.')[0]
+#                 time_component = base.split('-')
+#                 d_year = int(time_component[0])
+#                 d_month = int(time_component[1])
+#                 d_day = int(time_component[2])
+#
+#                 if d_year != year:
+#                     continue
+#
+#                 week_number = get_week_number(d_year, d_month, d_day)
+#                 res.update({week_number: f_path})
+#
+#             except Exception as err:
+#                 logger.error(f"{err}")
+#                 continue
+#
+#     logger.debug(f"data: {res}")
+#
+#     return res
 
 
 app = dash.Dash(
@@ -93,7 +95,7 @@ app.layout = html.Div(
                 ),
                 html.Div(
                     id="graph-container",
-                    children=[graph_layout_1, graph_layout_2],
+                    children=[generate_default_histogram_graph(), graph_layout_2],
                 ),
             ]
         ),
@@ -135,27 +137,7 @@ def update_basemap(year: int, data_type: str, week_number: int, site_name: str, 
 
     map_figure = [dl.TileLayer(url=BASEMAP_URL.format(map_style=input_map_style, access_token=MAPBOX_API_KEY))]
 
-    default_hist = dict(
-            data=[go.Scatter(x=[], y=[])],
-            layout=dict(
-                paper_bgcolor="#1f2630",
-                plot_bgcolor="#1f2630",
-                font=dict(color="#2cfec1"),
-                autofill=True,
-                margin=dict(t=75, r=50, b=50, l=50),
-                title='N/A',
-                xaxis={
-                    'title': dict(
-                        text="N/A"
-                    )
-                },
-                yaxis={
-                    'title': dict(
-                        text="N/A"
-                    )
-                }
-            ),
-        ),
+    default_hist = generate_default_histogram_layout()
 
     try:
         data_mapper = map_data_path_to_week(data_type=data_type, site_name=site_name, year=year)
@@ -186,29 +168,30 @@ def update_basemap(year: int, data_type: str, week_number: int, site_name: str, 
                                 colorscale=tif_color_scale.get('colorscale'),
                                 style={"color": tif_color_scale.get('colorscale')[0]})
                 ],
-                    center=tif_data.center, zoom=13)
+                    center=tif_data.center, zoom=20)
             ]
 
             figure = dict(
-                data=[go.Histogram(x=tif_data.get_pixels())],
+                data=[go.Histogram(x=tif_data.get_pixels(), nbinsx=20)],
                 layout=dict(
                     paper_bgcolor="#1f2630",
                     plot_bgcolor="#1f2630",
                     font=dict(color="#2cfec1"),
                     autofill=True,
                     margin=dict(t=75, r=50, b=50, l=50),
-                    title=f"Histogram of {data_type} for {site_name}",
+                    title=f"Distribution of pixel values for {data_type} at {site_name}",
                     xaxis={
                         'title': dict(
                             text="Value"
-                        )
+                        ),
                     },
                     yaxis={
                         'title': dict(
-                            text="Count"
-                        )
+                            text="Count",
+                        ),
+                        'type': 'log'
                     }
-                ),
+                )
             )
 
             return map_figure, figure
@@ -242,7 +225,7 @@ def show_pixel(click_lat_lng):
         raise dash.exceptions.PreventUpdate("cancel the callback")
     except Exception as err:
         logger.error(f"{err}")
-        raise dash.exceptions.PreventUpdate("cancel the callback")
+        raise dash.exceptions.PreventUpdate("No value found. Cancel the callback")
 
 
 
