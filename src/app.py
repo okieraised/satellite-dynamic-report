@@ -135,6 +135,28 @@ def update_basemap(year: int, data_type: str, week_number: int, site_name: str, 
 
     map_figure = [dl.TileLayer(url=BASEMAP_URL.format(map_style=input_map_style, access_token=MAPBOX_API_KEY))]
 
+    default_hist = dict(
+            data=[go.Scatter(x=[], y=[])],
+            layout=dict(
+                paper_bgcolor="#1f2630",
+                plot_bgcolor="#1f2630",
+                font=dict(color="#2cfec1"),
+                autofill=True,
+                margin=dict(t=75, r=50, b=50, l=50),
+                title='N/A',
+                xaxis={
+                    'title': dict(
+                        text="N/A"
+                    )
+                },
+                yaxis={
+                    'title': dict(
+                        text="N/A"
+                    )
+                }
+            ),
+        ),
+
     try:
         data_mapper = map_data_path_to_week(data_type=data_type, site_name=site_name, year=year)
 
@@ -191,29 +213,11 @@ def update_basemap(year: int, data_type: str, week_number: int, site_name: str, 
 
             return map_figure, figure
 
+        return map_figure, default_hist
+
     except Exception as err:
         logger.error(f"{err}")
-        return map_figure, dict(
-            data=[go.Scatter(x=[], y=[])],
-            layout=dict(
-                paper_bgcolor="#1f2630",
-                plot_bgcolor="#1f2630",
-                font=dict(color="#2cfec1"),
-                autofill=True,
-                margin=dict(t=75, r=50, b=50, l=50),
-                title='N/A',
-                xaxis={
-                    'title': dict(
-                        text="N/A"
-                    )
-                },
-                yaxis={
-                    'title': dict(
-                        text="N/A"
-                    )
-                }
-            ),
-        ),
+        return map_figure, default_hist
 
 
 @app.callback(

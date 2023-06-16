@@ -36,7 +36,7 @@ def generate_title_layout() -> html.Div:
 def generate_map_dropdown_menu(dropdown_id: str, options: any, value: any) -> html.Div:
     dropdown = html.Div(
         [
-            dcc.Dropdown(options=options, value=value, id=dropdown_id)
+            dcc.Dropdown(options=options, value=value, id=dropdown_id, clearable=False, multi=False)
         ],
         className='three columns',
         style=dict(width='25%')
