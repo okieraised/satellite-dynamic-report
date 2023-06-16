@@ -21,23 +21,6 @@ def default_data() -> go.Scattermapbox:
     return data
 
 
-# def default_shapefile():
-#     geodf = gpd.read_file('/Users/tripham/Documents/Sample_Data/1_shp_files_v2/Housel_v2.geojson')
-#
-#     data = geodf.to_json()
-#     data = json.loads(data)
-#     gdf = gpd.GeoDataFrame.from_features(data)
-#     point = (148.90635, -20.25866)
-#
-#     return {
-#         "source": json.loads(gdf.geometry.to_json()),
-#         "below": "traces",
-#         "type": "line",
-#         "color": "purple",
-#         "line": {"width": 1.5},
-#     }
-
-
 def generate_default_time_series_fig() -> dict:
     default_time_series_fig = dict(
         data=[go.Scatter(x=[], y=[])],

@@ -212,6 +212,8 @@ def generate_time_series_graph_by_site(dropdown_id: str, graph_id: str, data: di
                 options=dropdown_options,
                 value=dropdown_value,
                 id=dropdown_id,
+                clearable=False,
+                multi=False
             ),
             dcc.Graph(
                 id=graph_id,
