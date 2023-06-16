@@ -44,7 +44,6 @@ class GeoTiffObject(object):
             logger.error(f"{err}")
             return [], (0, 0)
 
-
     def get_pixels(self):
         px_vals = []
 

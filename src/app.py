@@ -75,6 +75,7 @@ app = dash.Dash(
         ],
         title="Dynamic Report",
         suppress_callback_exceptions=True,
+        prevent_initial_callbacks=True,
     )
 
 server = app.server
@@ -115,6 +116,7 @@ app.layout = html.Div(
 @app.callback(
     [
         Output(component_id='heatmap-container', component_property='children'),
+        Output(component_id='selected-data-1', component_property='figure')
     ],
     [
         Input(component_id="slider", component_property="value"),
@@ -165,11 +167,53 @@ def update_basemap(year: int, data_type: str, week_number: int, site_name: str, 
                     center=tif_data.center, zoom=13)
             ]
 
-        return map_figure
+            figure = dict(
+                data=[go.Histogram(x=tif_data.get_pixels())],
+                layout=dict(
+                    paper_bgcolor="#1f2630",
+                    plot_bgcolor="#1f2630",
+                    font=dict(color="#2cfec1"),
+                    autofill=True,
+                    margin=dict(t=75, r=50, b=50, l=50),
+                    title=f"Histogram of {data_type} for {site_name}",
+                    xaxis={
+                        'title': dict(
+                            text="Value"
+                        )
+                    },
+                    yaxis={
+                        'title': dict(
+                            text="Count"
+                        )
+                    }
+                ),
+            )
+
+            return map_figure, figure
 
     except Exception as err:
         logger.error(f"{err}")
-        return map_figure
+        return map_figure, dict(
+            data=[go.Scatter(x=[], y=[])],
+            layout=dict(
+                paper_bgcolor="#1f2630",
+                plot_bgcolor="#1f2630",
+                font=dict(color="#2cfec1"),
+                autofill=True,
+                margin=dict(t=75, r=50, b=50, l=50),
+                title='N/A',
+                xaxis={
+                    'title': dict(
+                        text="N/A"
+                    )
+                },
+                yaxis={
+                    'title': dict(
+                        text="N/A"
+                    )
+                }
+            ),
+        ),
 
 
 @app.callback(
