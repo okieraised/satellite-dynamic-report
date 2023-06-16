@@ -149,9 +149,11 @@ def generate_aggregate_figure(data: list, xaxis: str = "N/A", yaxis: str = "N/A"
             paper_bgcolor="#1f2630",
             plot_bgcolor="#1f2630",
             font=dict(color="#2cfec1"),
-            autofill=True,
             margin=dict(t=75, r=50, b=50, l=50),
-            title=title,
+            title={
+                'text': title,
+                'x': 0.5
+            },
             xaxis={
                 'title': dict(
                     text=xaxis
@@ -168,7 +170,7 @@ def generate_aggregate_figure(data: list, xaxis: str = "N/A", yaxis: str = "N/A"
     return figure
 
 
-def generate_aggregate_graph(data: pd.DataFrame):
+def generate_aggregate_graph(data: pd.DataFrame, xaxis: str = "N/A", yaxis: str = "N/A", title: str = "N/A"):
     if data.empty:
         fig_data = [go.Scatter(x=[], y=[])]
     else:
@@ -177,7 +179,7 @@ def generate_aggregate_graph(data: pd.DataFrame):
 
     graph_layout = dcc.Graph(
         id="selected-data-2",
-        figure=generate_aggregate_figure(data=fig_data)
+        figure=generate_aggregate_figure(data=fig_data, xaxis=xaxis, yaxis=yaxis, title=title)
     )
 
     return graph_layout

@@ -16,6 +16,7 @@ def get_obj_path(data_type: str, site_name: str) -> list:
 
 
 def get_aggregate_of_data(data_type: str, site_name: str):
+    df = pd.DataFrame()
 
     res = dict(date=[], min=[], max=[], avg=[])
 
@@ -36,9 +37,9 @@ def get_aggregate_of_data(data_type: str, site_name: str):
                 avg_pix = tif_data.avg_pix()
 
                 res.get('date').append(d_date)
-                res.get('min').append(min_pix)
-                res.get('max').append(max_pix)
-                res.get('avg').append(avg_pix)
+                res.get('min').append(float(f"{min_pix:.2f}"))
+                res.get('max').append(float(f"{max_pix:.2f}"))
+                res.get('avg').append(float(f"{avg_pix:.2f}"))
 
             except Exception as err:
                 logger.error(f"{err}")
@@ -50,9 +51,9 @@ def get_aggregate_of_data(data_type: str, site_name: str):
             return df
         except Exception as err:
             logger.error(f"{err}")
-            return None
+            return df
 
-    return None
+    return df
 
 
 def map_data_path_to_week(data_type: str, site_name: str, year: int) -> dict:

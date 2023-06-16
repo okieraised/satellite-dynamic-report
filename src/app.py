@@ -57,7 +57,9 @@ app.layout = html.Div(
                 ),
                 html.Div(
                     id="graph-container",
-                    children=[generate_default_histogram_graph(), generate_aggregate_graph(data=default_df)],
+                    children=[generate_default_histogram_graph(),
+                              generate_aggregate_graph(data=default_df, xaxis="Time", yaxis="Pixel Value",
+                                                       title=f"Time series of Max/Min/Avg of pixels at {DEFAULT_SITE}")],
                 ),
             ]
         ),
@@ -277,19 +279,22 @@ def update_time_series_graph(variable_input, site_input):
         Input(component_id="site-dropdown", component_property="value"),
 
     ],
-    prevent_initial_call=True,
     allow_duplicate=True,
 )
 def update_aggregate_figure(data_type: str, site_name: str):
-    df = get_aggregate_of_data(data_type=data_type, site_name=site_name)
-    if not df.empty:
-        col_name = 'min'
-        data = [go.Scatter(x=df.index.tolist(), y=df[col_name].tolist())] #  for col_name in df.columns
-        return generate_aggregate_figure(data=data)
+    try:
+        df = get_aggregate_of_data(data_type=data_type, site_name=site_name)
+        if not df.empty:
+            fig_data = [go.Scatter(x=df.index.tolist(), y=df[col_name].tolist(), name=col_name, mode="markers")
+                        for col_name in df.columns]
 
-
-
-
+            return [go.Figure(generate_aggregate_figure(data=fig_data, xaxis="Time", yaxis="Pixel Value",
+                                                        title=f"Time series of Max/Min/Avg of pixels at {site_name}"))]
+        else:
+            return [go.Figure(generate_aggregate_figure(data=[go.Scatter(x=[], y=[])]))]
+    except Exception as err:
+        logger.error(f"{err}")
+        raise dash.exceptions.PreventUpdate("Cancel the callback")
 
 
 
