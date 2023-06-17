@@ -157,7 +157,8 @@ def generate_aggregate_figure(data: list, xaxis: str = "N/A", yaxis: str = "N/A"
             xaxis={
                 'title': dict(
                     text=xaxis
-                )
+                ),
+                'tickformat': '%Y-%m-%d'
             },
             yaxis={
                 'title': dict(

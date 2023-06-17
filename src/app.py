@@ -19,7 +19,7 @@ from layout.layout import slider_layout, generate_title_layout, \
 import dash_bootstrap_components as dbc
 
 from time_series.time_series import query_time_series_data, VariableMapper
-from utils.datetime_utils import get_week_number
+from utils.datetime_utils import get_week_number, get_date_from_week_number
 from utils.logging import logger
 from utils.minio import Minio_Object
 from utils.query_data import map_data_path_to_week, get_aggregate_of_data
@@ -178,12 +178,15 @@ def update_basemap(year: int, data_type: str, week_number: int, site_name: str, 
 
     ],
     [
-        State('selected-data-2', 'figure')
+        State('selected-data-2', 'figure'),
+        State(component_id="slider", component_property="value"),
+        State(component_id="week-dropdown", component_property="value"),
     ],
     prevent_initial_call=True,
     allow_duplicate=True
 )
-def show_pixel(click_lat_lng, fig):
+def show_pixel(click_lat_lng, fig, year: int, week: int):
+    logger.info(f"show_pixel: year: {year} | week: {week}")
     try:
         old_data = fig.get('data')
         new_data = [d for d in old_data if d['name'] != 'selected pixel']
@@ -196,7 +199,8 @@ def show_pixel(click_lat_lng, fig):
         value = click_lat_lng[2]
         logger.info(f"lat: {lat} | long: {long} | value: {value}")
 
-        new_data.append(go.Scatter(x=['2023-06-17'], y=[value], mode="markers", name='selected pixel'))
+        new_data.append(go.Scatter(x=[get_date_from_week_number(year=year, week=week)],
+                                   y=[value], mode="markers", name='selected pixel'))
         fig['data'] = new_data
         return [go.Figure(fig)]
     except Exception as err:
