@@ -102,6 +102,7 @@ def update_basemap(year: int, data_type: str, week_number: int, site_name: str, 
         data_mapper = map_data_path_to_week(data_type=data_type, site_name=site_name, year=year)
 
         file_name = data_mapper.get(week_number)
+        logger.info(f"file name: {file_name}")
 
         if file_name:
             prefix = f'{data_type}/{site_name}/'.lower()
@@ -304,6 +305,6 @@ def update_aggregate_figure(data_type: str, site_name: str):
 
 
 if __name__ == "__main__":
-    app.run_server(debug=True, port=18050, processes=1, threaded=True)
+    app.run_server(debug=True, port=18050, processes=1, threaded=True, use_reloader=False)
 
 
