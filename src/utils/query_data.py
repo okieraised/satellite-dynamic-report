@@ -1,10 +1,19 @@
-from constants.constants import MINIO_BUCKET, DataType, Site
+from constants.constants import MINIO_BUCKET, DataType, Site, MINIO_ENDPOINT_URL
 from geospatial.geotiff import GeoTiffObject
 from utils.datetime_utils import get_week_number, validate_file_format
 from utils.logging import logger
 from utils.minio import Minio_Object
 
 import pandas as pd
+
+
+def query_geojson_urls() -> list:
+    gjson_raw = Minio_Object.minio_list_objects(MINIO_BUCKET, prefix='shapefile')
+    gjson_paths = [i['Key'] for i in gjson_raw if str(i['Key']).endswith('geojson')]
+    logger.info(f"got {len(gjson_paths)} geojson objects")
+    obj_paths = ['/'.join([MINIO_ENDPOINT_URL, MINIO_BUCKET, p]) for p in gjson_paths]
+    logger.info(f"objects: {obj_paths}")
+    return obj_paths
 
 
 def get_obj_path(data_type: str, site_name: str) -> list:
@@ -88,5 +97,6 @@ def map_data_path_to_week(data_type: str, site_name: str, year: int) -> dict:
 
 
 if __name__ == "__main__":
-    objects = get_aggregate_of_data(DataType.EVI, Site.Housel)
+    # objects = get_aggregate_of_data(DataType.EVI, Site.Housel)
+    objects = query_geojson_urls()
     print(objects)

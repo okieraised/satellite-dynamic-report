@@ -6,7 +6,6 @@ from dash import dcc, html
 import dash_leaflet as dl
 from constants.constants import YEARS, DropdownMapper, MapType, Site, MAPBOX_API_KEY, OH_LONG, OH_LAT, DEFAULT_SITE, \
     OK_LAT, OK_LONG, BASEMAP_URL, DEFAULT_DATA
-from geospatial.shapefile import default_geojson_data
 from layout.default_layout import default_data
 from time_series.time_series import VariableMapper
 from utils.datetime_utils import get_current_week_number
@@ -47,14 +46,20 @@ def generate_map_dropdown_menu(dropdown_id: str, options: any, value: any) -> ht
     return dropdown
 
 
-def render_basemap(map_type: str) -> dl.Map:
+def render_basemap(map_type: str, geojson_urls: list = None) -> dl.Map:
+    map_layer_children = [dl.TileLayer(url=BASEMAP_URL.format(map_style=map_type, access_token=MAPBOX_API_KEY))]
+
+    if geojson_urls:
+        for geojson_url in geojson_urls:
+            map_layer_children.append(dl.GeoJSON(url=geojson_url))
+
     map_layout = dl.Map(
         id='heatmap-container',
         style={'marginLeft': '0px',
                'marginRight': '0px',
                'margin-top': '10px',
                'margin-bottom': '0px'},
-        children=[dl.TileLayer(url=BASEMAP_URL.format(map_style=map_type, access_token=MAPBOX_API_KEY))],
+        children=map_layer_children,
         zoom=6,
         center=(OH_LAT, OH_LONG),
     )

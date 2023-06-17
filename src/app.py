@@ -1,32 +1,23 @@
 import dash
-from dash import Dash, dcc, html, Input, Output, State
+from dash import html, Input, Output, State
 import dash_leaflet as dl
-
-import plotly.express as px
 import plotly.graph_objects as go
-import geopandas as gpd
-import os
-import pandas as pd
 
-from constants.constants import MAPBOX_API_KEY, OK_LONG, OK_LAT, YEARS, MapType, OH_LAT, OH_LONG, BASEMAP_URL, \
-    MINIO_BUCKET, DEFAULT_DATA, DEFAULT_SITE, CURRENT_YEAR
+from constants.constants import MAPBOX_API_KEY, MapType, BASEMAP_URL, DEFAULT_DATA, DEFAULT_SITE
 from geospatial.geotiff import GeoTiffObject
-from geospatial.shapefile import default_geojson_data
-from layout.default_layout import default_data, generate_default_time_series_fig
+from layout.default_layout import generate_default_time_series_fig
 from layout.layout import slider_layout, generate_title_layout, \
     generate_time_series_graph_by_site, render_basemap, generate_default_histogram_graph, \
     generate_default_graph_layout, generate_aggregate_graph, generate_aggregate_figure
-import dash_bootstrap_components as dbc
 
 from time_series.time_series import query_time_series_data, VariableMapper
-from utils.datetime_utils import get_week_number, get_date_from_week_number
+from utils.datetime_utils import get_date_from_week_number
 from utils.logging import logger
-from utils.minio import Minio_Object
-from utils.query_data import map_data_path_to_week, get_aggregate_of_data
+from utils.query_data import map_data_path_to_week, get_aggregate_of_data, query_geojson_urls
 
 csv_data = query_time_series_data()
 default_df = get_aggregate_of_data(data_type=DEFAULT_DATA, site_name=DEFAULT_SITE)
-
+geojson_urls = query_geojson_urls()
 
 
 app = dash.Dash(
@@ -53,7 +44,7 @@ app.layout = html.Div(
             children=[
                 html.Div(
                     id="left-column",
-                    children=[slider_layout, render_basemap(map_type=MapType.DEFAULT)],
+                    children=[slider_layout, render_basemap(map_type=MapType.DEFAULT, geojson_urls=geojson_urls)],
                 ),
                 html.Div(
                     id="graph-container",
@@ -101,6 +92,9 @@ def update_basemap(year: int, data_type: str, week_number: int, site_name: str, 
                 f"input_map_value: {input_map_style}")
 
     map_figure = [dl.TileLayer(url=BASEMAP_URL.format(map_style=input_map_style, access_token=MAPBOX_API_KEY))]
+    if geojson_urls:
+        for geojson_url in geojson_urls:
+            map_figure.append(dl.GeoJSON(url=geojson_url))
 
     default_hist = generate_default_graph_layout()
 
@@ -121,9 +115,7 @@ def update_basemap(year: int, data_type: str, week_number: int, site_name: str, 
             logger.info(f"geotiff max_pix: {tif_data.max_pix()} | geotiff min_pix: {tif_data.min_pix()} | "
                         f"geotiff center: {tif_data.center}")
 
-            map_figure = [
-                dl.Map(children=[
-                    dl.TileLayer(url=BASEMAP_URL.format(map_style=input_map_style, access_token=MAPBOX_API_KEY)),
+            map_figure.extend([
                     dl.GeoTIFFOverlay(id="raster", interactive=True, url=tif_url, band=0, opacity=0.5,
                                       **tif_color_scale),
                     dl.Colorbar(width=200, height=20, min=tif_color_scale.get('domainMin'),
@@ -132,9 +124,9 @@ def update_basemap(year: int, data_type: str, week_number: int, site_name: str, 
                                 tickDecimals=2, unit=" ",
                                 colorscale=tif_color_scale.get('colorscale'),
                                 style={"color": tif_color_scale.get('colorscale')[0]})
-                ],
-                    center=tif_data.center, zoom=20)
-            ]
+                ])
+
+            map_figure = [dl.Map(children=map_figure, center=tif_data.center, zoom=20)]
 
             figure = dict(
                 data=[go.Histogram(x=tif_data.get_pixels(), nbinsx=20)],
@@ -311,20 +303,7 @@ def update_aggregate_figure(data_type: str, site_name: str):
         raise dash.exceptions.PreventUpdate("Cancel the callback")
 
 
-
 if __name__ == "__main__":
     app.run_server(debug=True, port=18050, processes=1, threaded=True)
-
-
-'''
-Absolutely, the data will be available in a server, it can be AWS or Microsoft.  
-The data types are TIFF, .shp, and .csv.   
-There will be a folder with the data for each week 1to52 and other folder with historic data. 
- The TIFF data represents different layers of information and ideally, we would like that the dynamic report displays 
- one of the layers in a map, but having the option to choose different layers.  In addition, to display the different 
- layer values when moving the cursor over the map and when clicking in a region generating the graphs for that layer.  
- The graphs would be YeartoDate value and comparison with the historic value for that pixel. 
- The other graph will be the field average and how it compares to that pixel value in the year to date.
-'''
 
 
