@@ -1,5 +1,5 @@
 import dash
-from dash import Dash, dcc, html, Input, Output
+from dash import Dash, dcc, html, Input, Output, State
 import dash_leaflet as dl
 
 import plotly.express as px
@@ -92,7 +92,8 @@ app.layout = html.Div(
         Input(component_id='basemap-dropdown', component_property='value')
 
     ],
-    prevent_initial_call=True
+    prevent_initial_call=True,
+    allow_duplicate=True,
 )
 def update_basemap(year: int, data_type: str, week_number: int, site_name: str, input_map_style):
 
@@ -169,29 +170,38 @@ def update_basemap(year: int, data_type: str, week_number: int, site_name: str, 
 
 @app.callback(
     [
-        Output(component_id="app-container", component_property="children")
+        # Output(component_id="app-container", component_property="children")
+        Output(component_id='selected-data-2', component_property='figure', allow_duplicate=True)
     ],
     [
-        Input(component_id="raster", component_property='click_lat_lng_val')
+        Input(component_id="raster", component_property='click_lat_lng_val'),
+
     ],
-    allow_duplicate=True,
-    prevent_initial_call=True
+    [
+        State('selected-data-2', 'figure')
+    ],
+    prevent_initial_call=True,
+    allow_duplicate=True
 )
-def show_pixel(click_lat_lng):
+def show_pixel(click_lat_lng, fig):
     try:
+        old_data = fig.get('data')
+        new_data = [d for d in old_data if d['name'] != 'selected pixel']
+
         if not click_lat_lng:
             raise dash.exceptions.PreventUpdate("cancel the callback")
 
         lat = click_lat_lng[0]
         long = click_lat_lng[1]
         value = click_lat_lng[2]
+        logger.info(f"lat: {lat} | long: {long} | value: {value}")
 
-        print(lat, long, value)
-        raise dash.exceptions.PreventUpdate("cancel the callback")
+        new_data.append(go.Scatter(x=['2023-06-17'], y=[value], mode="markers", name='selected pixel'))
+        fig['data'] = new_data
+        return [go.Figure(fig)]
     except Exception as err:
         logger.error(f"{err}")
         raise dash.exceptions.PreventUpdate("No value found. Cancel the callback")
-
 
 
 @app.callback(
