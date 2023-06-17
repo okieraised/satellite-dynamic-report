@@ -97,6 +97,6 @@ def map_data_path_to_week(data_type: str, site_name: str, year: int) -> dict:
 
 
 if __name__ == "__main__":
-    # objects = get_aggregate_of_data(DataType.EVI, Site.Housel)
-    objects = query_geojson_urls()
+    objects = get_aggregate_of_data(DataType.EVI, Site.Housel)
+    # objects = query_geojson_urls()
     print(objects)

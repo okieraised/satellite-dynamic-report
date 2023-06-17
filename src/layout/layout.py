@@ -6,10 +6,8 @@ from dash import dcc, html
 import dash_leaflet as dl
 from constants.constants import YEARS, DropdownMapper, MapType, Site, MAPBOX_API_KEY, OH_LONG, OH_LAT, DEFAULT_SITE, \
     OK_LAT, OK_LONG, BASEMAP_URL, DEFAULT_DATA
-from layout.default_layout import default_data
 from time_series.time_series import VariableMapper
 from utils.datetime_utils import get_current_week_number
-from utils.query_data import get_aggregate_of_data
 
 
 def generate_title_layout() -> html.Div:
