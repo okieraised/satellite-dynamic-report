@@ -20,7 +20,9 @@ VariableMapper = dict(
     nir="Near-infrared (NIR)",
     red="Red",
     swir1="SWIR 1",
-    swir2="SWIR 2"
+    swir2="SWIR 2",
+    temperature_2m="Air Temperature (°C)",
+    PAR_mol="Photosynthetically Active Radiation (mol/m2/d)",
 )
 
 

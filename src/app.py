@@ -246,6 +246,10 @@ def update_time_series_graph(variable_input, site_input):
             logger.error(f"Site {site_input} has no data.")
             return generate_default_time_series_fig(), []
 
+        if variable_input not in site_df.columns:
+            variable_input = site_options[0].get("value")
+            # return generate_default_time_series_fig(), site_options
+
         y_axis_title = VariableMapper.get(variable_input)
 
         fig = dict(
@@ -260,7 +264,8 @@ def update_time_series_graph(variable_input, site_input):
                 xaxis={
                     'title': dict(
                         text="Year"
-                    )
+                    ),
+                    'tickformat': '%Y-%m-%d'
                 },
                 yaxis={
                     'title': dict(
@@ -304,6 +309,6 @@ def update_aggregate_figure(data_type: str, site_name: str):
 
 
 if __name__ == "__main__":
-    app.run_server( debug=True, port=18050, processes=1, threaded=True, use_reloader=False) # host="0.0.0.0",
+    app.run_server(debug=True, port=18050, processes=1, threaded=True, use_reloader=False) # host="0.0.0.0",
 
 
