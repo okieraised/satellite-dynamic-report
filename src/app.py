@@ -121,13 +121,13 @@ def update_basemap(year: int, data_type: str, week_number: int, site_name: str, 
                                       **tif_color_scale),
                     dl.Colorbar(width=200, height=20, min=tif_color_scale.get('domainMin'),
                                 max=tif_color_scale.get('domainMax'),
-                                position="bottomleft",
+                                position="topleft",
                                 tickDecimals=2, unit=" ",
                                 colorscale=tif_color_scale.get('colorscale'),
                                 style={"color": tif_color_scale.get('colorscale')[0]})
                 ])
 
-            map_figure = [dl.Map(children=map_figure, center=tif_data.center, zoom=20)]
+            map_figure = [dl.Map(children=map_figure, center=tif_data.center, zoom=15)]
 
             figure = dict(
                 data=[go.Histogram(x=tif_data.get_pixels(), nbinsx=20)],
@@ -226,7 +226,6 @@ def show_pixel(click_lat_lng, fig, year: int, week: int):
     prevent_initial_call=True
 )
 def update_time_series_graph(variable_input, site_input):
-
     logger.info(f"variable_input: {variable_input} | site_input: {site_input}")
 
     try:
@@ -305,6 +304,6 @@ def update_aggregate_figure(data_type: str, site_name: str):
 
 
 if __name__ == "__main__":
-    app.run_server(debug=True, port=18050, processes=1, threaded=True, use_reloader=False)
+    app.run_server( debug=True, port=18050, processes=1, threaded=True, use_reloader=False) # host="0.0.0.0",
 
 

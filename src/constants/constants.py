@@ -32,12 +32,16 @@ class Site(object):
     Housel = "Housel"
     Pratt = "Pratt"
     Weisse = "Weisse"
+    SESAJAL1 = "Sesajal1"
+    SESAJAL2 = "Sesajal2"
 
 
 class DataType(object):
     EVI = "EVI"
     VI = "VI"
     SR = "SR"
+    GPP ="GPP"
+    VH = "VH"
 
 
 class MapType(object):
@@ -96,6 +100,14 @@ class DropdownMapper(object):
         {
             "label": "Surface Reflectance (SR)",
             "value": DataType.SR,
+        },
+        {
+            "label": "Vegetation Carbon Uptake (GPP)",
+            "value": DataType.GPP,
+        },
+        {
+            "label": "Vegetation Health (VH)",
+            "value": DataType.VH,
         },
     ]
 

@@ -12,17 +12,20 @@
     pip install -r requirements.txt
     ```
 
+3. Change the variables in the `.env` file to your S3 settings, but keeps the 
+`MAPBOX_API_KEY` value the same
+
 ## II. Data Organization
 - Satellite data is stored in MinIO. The organization format is as follows:
     ```shell
     └── Bucket-Name (dynamic-data)
         ├── shapefile
         │   ├── housel
-        │   │   └── housel.shp
+        │   │   └── housel.geojson
         │   ├── pratt
-        │   │   └── pratt.shp
+        │   │   └── pratt.geojson
         │   └── weisse
-        │       └── weisse.shp
+        │       └── weisse.geojson
         │      
         ├── evi
         │   ├── housel
@@ -94,4 +97,4 @@ paste this into the `Access Policy` section with `custom` option specified:
 ```
 
 ## III. Running the app
-The app is run on port 18050
+For local run, use pycharm and run the `app.py` file. The app is run on port 18050

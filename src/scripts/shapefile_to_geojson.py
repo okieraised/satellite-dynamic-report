@@ -20,5 +20,7 @@ def shapefile_to_geojson(file_path: str):
 
 
 if __name__ == "__main__":
-    res = list_file_with_same_ext("/Users/tripham/Documents/Sample_Data/1_shp_files_v2", ".shp")
+    res = list_file_with_same_ext("/Users/tripham/Downloads/Sesajal_Data/shp", ".shp")
+    for f in res:
+        shapefile_to_geojson(f)
 
