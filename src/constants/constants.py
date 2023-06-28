@@ -40,7 +40,7 @@ class DataType(object):
     EVI = "EVI"
     VI = "VI"
     SR = "SR"
-    GPP ="GPP"
+    GPP = "GPP"
     VH = "VH"
 
 

@@ -124,7 +124,7 @@ def update_basemap(year: int, data_type: str, week_number: int, site_name: str, 
                                 position="topleft",
                                 tickDecimals=2, unit=" ",
                                 colorscale=tif_color_scale.get('colorscale'),
-                                style={"color": tif_color_scale.get('colorscale')[0]})
+                                style={"color": "white", "weight": 2})
                 ])
 
             map_figure = [dl.Map(children=map_figure, center=tif_data.center, zoom=15)]
