@@ -3,7 +3,7 @@ from dash import html, Input, Output, State
 import dash_leaflet as dl
 import plotly.graph_objects as go
 
-from constants.constants import MAPBOX_API_KEY, MapType, BASEMAP_URL, DEFAULT_DATA, DEFAULT_SITE
+from constants.constants import MAPBOX_API_KEY, MapType, BASEMAP_URL, DEFAULT_DATA, DEFAULT_SITE, YEARS, DropdownMapper
 from geospatial.geotiff import GeoTiffObject
 from layout.default_layout import generate_default_time_series_fig
 from layout.layout import slider_layout, generate_title_layout, \
@@ -11,9 +11,9 @@ from layout.layout import slider_layout, generate_title_layout, \
     generate_default_graph_layout, generate_aggregate_graph, generate_aggregate_figure
 
 from time_series.time_series import query_time_series_data, VariableMapper
-from utils.datetime_utils import get_date_from_week_number
+from utils.datetime_utils import get_date_from_week_number, validate_file_format
 from utils.logging import logger
-from utils.query_data import map_data_path_to_week, get_aggregate_of_data, query_geojson_urls
+from utils.query_data import map_data_path_to_week, get_aggregate_of_data, query_geojson_urls, get_obj_path
 
 csv_data = query_time_series_data()
 default_df = get_aggregate_of_data(data_type=DEFAULT_DATA, site_name=DEFAULT_SITE)
@@ -163,12 +163,10 @@ def update_basemap(year: int, data_type: str, week_number: int, site_name: str, 
 
 @app.callback(
     [
-        # Output(component_id="app-container", component_property="children")
         Output(component_id='selected-data-2', component_property='figure', allow_duplicate=True)
     ],
     [
         Input(component_id="raster", component_property='click_lat_lng_val'),
-
     ],
     [
         State('selected-data-2', 'figure'),
@@ -226,7 +224,7 @@ def show_pixel(click_lat_lng, fig, year: int, week: int):
     prevent_initial_call=True
 )
 def update_time_series_graph(variable_input, site_input):
-    logger.info(f"variable_input: {variable_input} | site_input: {site_input}")
+    logger.info(f"update time series graph - variable_input: {variable_input} | site_input: {site_input}")
 
     try:
         site_data = csv_data.get(site_input, None)
@@ -306,6 +304,76 @@ def update_aggregate_figure(data_type: str, site_name: str):
     except Exception as err:
         logger.error(f"{err}")
         raise dash.exceptions.PreventUpdate("Cancel the callback")
+
+
+@app.callback(
+    [
+        Output(component_id='slider', component_property='marks'),
+        # Output(component_id='week-dropdown', component_property='options')
+    ],
+    [
+        Input(component_id="data-type-dropdown", component_property="value"),
+        Input(component_id="site-dropdown", component_property="value"),
+
+    ],
+    allow_duplicate=True,
+)
+def update_available_year_data_slider(data_type: str, site_name: str):
+
+    available_years = []
+
+    logger.info(f"update year slider input - data_type: {data_type} | site_name: {site_name}")
+
+    o_paths = get_obj_path(data_type=data_type, site_name=site_name)
+
+    # logger.info(f"update slider: {o_paths}")
+
+    prefix = f'{data_type}/{site_name}/'.lower()
+    if len(o_paths) > 0:
+        for o_path in o_paths:
+            f_path = o_path.split(prefix)[1]
+            try:
+                d_date = str(f_path).split('.')[0]
+                if not validate_file_format(d_date):
+                    continue
+
+                d_component = d_date.split('-')
+                d_year = d_component[0]
+                available_years.append(d_year)
+            except Exception as err:
+                logger.error(f"{err}")
+                continue
+
+    available_years = list(set(available_years))
+    no_data_years = [str(x) for x in YEARS if x not in available_years]
+
+    print(f"available_years: {available_years}")
+    print(f"no_data_years: {no_data_years}")
+
+    if len(available_years) > 0:
+        return [{
+            str(year): {
+                "label": str(year),
+                "style": {"color": "#7fafdf"},
+            }
+            for year in list(set(available_years))
+        }]
+
+    # .extend([{
+    #             str(year): {
+    #                 "label": str(year),
+    #                 "style": {"color": "#FF0000"},
+    #             }
+    #             for year in no_data_years
+    #         }])
+
+    return [{
+        str(year): {
+            "label": str(year),
+            "style": {"color": "#7fafdf"},
+        }
+        for year in YEARS
+    }]
 
 
 if __name__ == "__main__":
