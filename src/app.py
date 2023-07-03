@@ -92,9 +92,9 @@ def update_basemap(year: int, data_type: str, week_number: int, site_name: str, 
                 f"input_map_value: {input_map_style}")
 
     map_figure = [dl.TileLayer(url=BASEMAP_URL.format(map_style=input_map_style, access_token=MAPBOX_API_KEY))]
-    if geojson_urls:
-        for geojson_url in geojson_urls:
-            map_figure.append(dl.GeoJSON(url=geojson_url))
+    # if geojson_urls:
+    #     for geojson_url in geojson_urls:
+    #         map_figure.append(dl.GeoJSON(url=geojson_url))
 
     default_hist = generate_default_graph_layout()
 
@@ -320,13 +320,13 @@ def update_aggregate_figure(data_type: str, site_name: str):
 )
 def update_available_year_data_slider(data_type: str, site_name: str):
 
+    res = {}
+
     available_years = []
 
     logger.info(f"update year slider input - data_type: {data_type} | site_name: {site_name}")
 
     o_paths = get_obj_path(data_type=data_type, site_name=site_name)
-
-    # logger.info(f"update slider: {o_paths}")
 
     prefix = f'{data_type}/{site_name}/'.lower()
     if len(o_paths) > 0:
@@ -339,38 +339,30 @@ def update_available_year_data_slider(data_type: str, site_name: str):
 
                 d_component = d_date.split('-')
                 d_year = d_component[0]
-                available_years.append(d_year)
+                available_years.append(int(d_year))
             except Exception as err:
                 logger.error(f"{err}")
                 continue
 
-    available_years = list(set(available_years))
-    no_data_years = [str(x) for x in YEARS if x not in available_years]
-
-    print(f"available_years: {available_years}")
-    print(f"no_data_years: {no_data_years}")
+    no_data_years = set(YEARS).symmetric_difference(set(available_years))
+    logger.info(f"available_years: {available_years}")
+    logger.info(f"no_data_years: {no_data_years}")
 
     if len(available_years) > 0:
-        return [{
+        res = {
             str(year): {
                 "label": str(year),
-                "style": {"color": "#7fafdf"},
+                "style": {"color": "#7fafdf" if year in available_years else "#FF0000"},
             }
-            for year in list(set(available_years))
-        }]
+            for year in YEARS
+        }
 
-    # .extend([{
-    #             str(year): {
-    #                 "label": str(year),
-    #                 "style": {"color": "#FF0000"},
-    #             }
-    #             for year in no_data_years
-    #         }])
+        return [res]
 
     return [{
         str(year): {
             "label": str(year),
-            "style": {"color": "#7fafdf"},
+            "style": {"color": "#FF0000"},
         }
         for year in YEARS
     }]

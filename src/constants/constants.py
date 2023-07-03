@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 today = datetime.date.today()
 CURRENT_YEAR = today.year
 
-YEARS = list(range(2003, CURRENT_YEAR + 1))
+YEARS = list(range(2000, CURRENT_YEAR + 1))
 
 load_dotenv()
 
