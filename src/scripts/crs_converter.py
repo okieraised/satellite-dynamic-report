@@ -56,7 +56,7 @@ def convert_to_epsg4326(in_dir: str, out_dir: str):
 
 
 if __name__ == "__main__":
-    in_path = '/Users/tripham/Documents/sample_sat/Housel_VIs'
-    out_path = '/Users/tripham/Documents/sample_sat/Housel_VIs2'
+    in_path = '/Users/tripham/Documents/hrd/'
+    out_path = '/Users/tripham/Documents/hrd2'
 
     convert_to_epsg4326(in_dir=in_path, out_dir=out_path)

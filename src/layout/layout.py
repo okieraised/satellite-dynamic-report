@@ -58,7 +58,7 @@ def render_basemap(map_type: str, geojson_urls: list = None) -> dl.Map:
                'margin-top': '10px',
                'margin-bottom': '0px'},
         children=map_layer_children,
-        zoom=6,
+        zoom=15,
         center=(OH_LAT, OH_LONG),
     )
 

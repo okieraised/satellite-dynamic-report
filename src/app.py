@@ -105,6 +105,10 @@ def update_basemap(year: int, data_type: str, week_number: int, site_name: str, 
         logger.info(f"file name: {file_name}")
 
         if file_name:
+            if geojson_urls:
+                for geojson_url in geojson_urls:
+                    map_figure.append(dl.GeoJSON(url=geojson_url))
+
             prefix = f'{data_type}/{site_name}/'.lower()
             obj_path = ''.join([prefix, file_name])
             logger.info(f"rendering object {obj_path}")
@@ -126,6 +130,8 @@ def update_basemap(year: int, data_type: str, week_number: int, site_name: str, 
                                 colorscale=tif_color_scale.get('colorscale'),
                                 style={"color": "white", "weight": 2})
                 ])
+
+
 
             map_figure = [dl.Map(children=map_figure, center=tif_data.center, zoom=15)]
 
