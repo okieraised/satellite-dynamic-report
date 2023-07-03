@@ -117,7 +117,7 @@ def update_basemap(year: int, data_type: str, week_number: int, site_name: str, 
                         f"geotiff center: {tif_data.center}")
 
             map_figure.extend([
-                    dl.GeoTIFFOverlay(id="raster", interactive=True, url=tif_url, band=0, opacity=0.5,
+                    dl.GeoTIFFOverlay(id="raster", interactive=True, url=tif_url, band=0, opacity=1,
                                       **tif_color_scale),
                     dl.Colorbar(width=200, height=20, min=tif_color_scale.get('domainMin'),
                                 max=tif_color_scale.get('domainMax'),

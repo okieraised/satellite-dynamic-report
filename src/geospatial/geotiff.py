@@ -74,7 +74,7 @@ class GeoTiffObject(object):
         min_val = self.min_pix()
         max_val = self.max_pix()
 
-        color_domain = dict(domainMin=min_val, domainMax=max_val, colorscale=['green', 'yellow', 'red'])
+        color_domain = dict(domainMin=min_val, domainMax=max_val, colorscale=['red', 'yellow', 'green'])
         return color_domain
 
     def get_current_week(self) -> int:
