@@ -11,7 +11,7 @@ from layout.layout import slider_layout, generate_title_layout, \
     generate_default_graph_layout, generate_aggregate_graph, generate_aggregate_figure
 
 from time_series.time_series import query_time_series_data, VariableMapper
-from utils.datetime_utils import get_date_from_week_number, validate_file_format
+from utils.datetime_utils import get_date_from_week_number, validate_file_format, get_week_number
 from utils.logging import logger
 from utils.query_data import map_data_path_to_week, get_aggregate_of_data, query_geojson_urls, get_obj_path
 
@@ -249,7 +249,6 @@ def update_time_series_graph(variable_input, site_input):
 
         if variable_input not in site_df.columns:
             variable_input = site_options[0].get("value")
-            # return generate_default_time_series_fig(), site_options
 
         y_axis_title = VariableMapper.get(variable_input)
 
@@ -311,8 +310,60 @@ def update_aggregate_figure(data_type: str, site_name: str):
 
 @app.callback(
     [
+        Output(component_id='week-dropdown', component_property='options'),
+    ],
+    [
+        Input(component_id="slider", component_property="value"),
+        Input(component_id="data-type-dropdown", component_property="value"),
+        Input(component_id="site-dropdown", component_property="value"),
+
+    ],
+    allow_duplicate=True,
+)
+def update_available_week_data_dropdown(year_value: int, data_type: str, site_name: str):
+
+    logger.info(f"update week dropdown input - year_value: {year_value} | data_type: {data_type} | site_name: {site_name}")
+
+    o_paths = get_obj_path(data_type=data_type, site_name=site_name)
+
+    res = dict()
+
+    prefix = f'{data_type}/{site_name}/'.lower()
+    if len(o_paths) > 0:
+        for o_path in o_paths:
+            f_path = o_path.split(prefix)[1]
+            try:
+                d_date = str(f_path).split('.')[0]
+                if not validate_file_format(d_date):
+                    continue
+
+                d_component = d_date.split('-')
+                d_year = int(d_component[0])
+                if int(d_year) != year_value:
+                    continue
+                d_month = int(d_component[1])
+                d_day = int(d_component[2])
+
+                week_number = get_week_number(d_year, d_month, d_day)
+
+                if res.get(d_year) is None:
+                    res[d_year] = []
+
+                res[d_year].append(week_number)
+
+            except Exception as err:
+                logger.error(f"{err}")
+                continue
+
+    if res.get(year_value) is None:
+        return [[]]
+
+    return [[{"label": f"Week {i}", "value": i} for i in res.get(year_value)]]
+
+
+@app.callback(
+    [
         Output(component_id='slider', component_property='marks'),
-        # Output(component_id='week-dropdown', component_property='options')
     ],
     [
         Input(component_id="data-type-dropdown", component_property="value"),
@@ -372,6 +423,6 @@ def update_available_year_data_slider(data_type: str, site_name: str):
 
 
 if __name__ == "__main__":
-    app.run_server(debug=True, port=18050, processes=1, threaded=True, use_reloader=False) # host="0.0.0.0",
+    app.run_server(debug=True, port=18050, processes=1, threaded=True) # host="0.0.0.0",
 
 
