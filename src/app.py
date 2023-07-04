@@ -92,9 +92,11 @@ def update_basemap(year: int, data_type: str, week_number: int, site_name: str, 
                 f"input_map_value: {input_map_style}")
 
     map_figure = [dl.TileLayer(url=BASEMAP_URL.format(map_style=input_map_style, access_token=MAPBOX_API_KEY))]
-    # if geojson_urls:
-    #     for geojson_url in geojson_urls:
-    #         map_figure.append(dl.GeoJSON(url=geojson_url))
+    if geojson_urls:
+        for geojson_url in geojson_urls:
+            map_figure.append(dl.GeoJSON(url=geojson_url, options={
+                "fill": False,
+            }))
 
     default_hist = generate_default_graph_layout()
 
@@ -105,9 +107,6 @@ def update_basemap(year: int, data_type: str, week_number: int, site_name: str, 
         logger.info(f"file name: {file_name}")
 
         if file_name:
-            if geojson_urls:
-                for geojson_url in geojson_urls:
-                    map_figure.append(dl.GeoJSON(url=geojson_url))
 
             prefix = f'{data_type}/{site_name}/'.lower()
             obj_path = ''.join([prefix, file_name])
@@ -130,8 +129,6 @@ def update_basemap(year: int, data_type: str, week_number: int, site_name: str, 
                                 colorscale=tif_color_scale.get('colorscale'),
                                 style={"color": "white", "weight": 2})
                 ])
-
-
 
             map_figure = [dl.Map(children=map_figure, center=tif_data.center, zoom=15)]
 
