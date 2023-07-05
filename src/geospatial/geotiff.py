@@ -49,6 +49,11 @@ class GeoTiffObject(object):
                 pix_val = None
                 if self.data_type == DataType.GPP:
                     pix_val = self.data[x, y] * 0.01
+                elif self.data_type == DataType.EVI:
+                    if self.data[x, y] > 1:
+                        pix_val = 1
+                    if self.data[x, y] < -1:
+                        pix_val = -1
                 else:
                     pix_val = self.data[x, y]
                 px_vals.append(pix_val)
@@ -57,7 +62,15 @@ class GeoTiffObject(object):
 
     def min_pix(self) -> float:
         try:
-            min_pix = self.data.min()
+            if self.data_type == DataType.GPP:
+                min_pix = self.data.min() * 0.01
+            elif self.data_type == DataType.EVI:
+                if self.data.min() < -1:
+                    min_pix = -1
+                else:
+                    min_pix = self.data.min()
+            else:
+                min_pix = self.data.min()
             return min_pix
         except Exception as err:
             logger.error(f"{err}")
@@ -65,7 +78,15 @@ class GeoTiffObject(object):
 
     def max_pix(self) -> float:
         try:
-            max_pix = self.data.max()
+            if self.data_type == DataType.GPP:
+                max_pix = self.data.max() * 0.01
+            elif self.data_type == DataType.EVI:
+                if self.data.max() > 1:
+                    max_pix = 1
+                else:
+                    max_pix = self.data.max()
+            else:
+                max_pix = self.data.max()
             return max_pix
         except Exception as err:
             logger.error(f"{err}")
@@ -73,7 +94,20 @@ class GeoTiffObject(object):
 
     def avg_pix(self) -> float:
         merged = list(itertools.chain.from_iterable(self.data))
-        return sum(merged) / len(merged)
+        if self.data_type == DataType.GPP:
+            avg = sum(merged) / len(merged) * 0.01
+        elif self.data_type == DataType.EVI:
+            sum_val = 0
+            for val in merged:
+                if val > 1:
+                    val = 1
+                if val < -1:
+                    val = -1
+                sum_val += val
+            avg = sum_val / len(merged)
+        else:
+            avg = sum(merged) / len(merged)
+        return avg
 
     def generate_color_scheme(self) -> dict:
 

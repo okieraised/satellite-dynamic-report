@@ -212,7 +212,9 @@ def show_pixel(click_lat_lng, fig, year: int, week: int, data_type: str):
         if data_type == DataType.GPP:
             value = value * 0.01
 
-        logger.info(f"lat: {lat} | long: {long} | value: {value}")
+        if data_type == DataType.EVI:
+            if value > 1:
+                value = 1
 
         new_data.append(go.Scatter(x=[get_date_from_week_number(year=year, week=week)],
                                    y=[value], mode="markers", name='selected pixel'))
