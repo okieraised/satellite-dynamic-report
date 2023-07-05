@@ -31,9 +31,17 @@ DEFAULT_CRS = "EPSG:4326"
 class Site(object):
     Housel = "Housel"
     Pratt = "Pratt"
-    Weisse = "Weisse"
-    SESAJAL1 = "Sesajal1"
-    SESAJAL2 = "Sesajal2"
+    # Weisse = "Weisse"
+    Sesajal1 = "Sesajal1"
+    Sesajal2 = "Sesajal2"
+
+
+SITE_LOCATION_MAPPER = {
+    Site.Housel: (41.771, -80.630),
+    Site.Pratt: (41.547, -80.860),
+    Site.Sesajal1: (26.463, -97.989),
+    Site.Sesajal2: (26.432, -98.019),
+}
 
 
 class DataType(object):
@@ -118,3 +126,4 @@ class DropdownMapper(object):
 
 if __name__ == "__main__":
     x = [{"label": val, "value": val} for key, val in Site.__dict__.items() if not key.startswith('__')]
+    print(DropdownMapper.SiteName)

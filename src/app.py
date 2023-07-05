@@ -3,7 +3,8 @@ from dash import html, Input, Output, State
 import dash_leaflet as dl
 import plotly.graph_objects as go
 
-from constants.constants import MAPBOX_API_KEY, MapType, BASEMAP_URL, DEFAULT_DATA, DEFAULT_SITE, YEARS, DropdownMapper
+from constants.constants import MAPBOX_API_KEY, MapType, BASEMAP_URL, DEFAULT_DATA, DEFAULT_SITE, YEARS, DropdownMapper, \
+    SITE_LOCATION_MAPPER, DataType
 from geospatial.geotiff import GeoTiffObject
 from layout.default_layout import generate_default_time_series_fig
 from layout.layout import slider_layout, generate_title_layout, \
@@ -94,6 +95,7 @@ def update_basemap(year: int, data_type: str, week_number: int, site_name: str, 
     map_figure = [dl.TileLayer(url=BASEMAP_URL.format(map_style=input_map_style, access_token=MAPBOX_API_KEY))]
     if geojson_urls:
         for geojson_url in geojson_urls:
+
             map_figure.append(dl.GeoJSON(url=geojson_url, options={
                 "fill": False,
             }))
@@ -119,15 +121,27 @@ def update_basemap(year: int, data_type: str, week_number: int, site_name: str, 
             logger.info(f"geotiff max_pix: {tif_data.max_pix()} | geotiff min_pix: {tif_data.min_pix()} | "
                         f"geotiff center: {tif_data.center}")
 
+            color_bar = None
+            if data_type == DataType.VH:
+                color_bar = dl.Colorbar(width=20, height=200, min=tif_color_scale.get('domainMin'),
+                                        max=tif_color_scale.get('domainMax'),
+                                        position="topleft",
+                                        tickDecimals=2, unit=" ",
+                                        colorscale=tif_color_scale.get('colorscale'),
+                                        tickText=["non-vegetation", "stressed", "healthy"],
+                                        style={"color": "white", "weight": 2})
+            else:
+                color_bar = dl.Colorbar(width=20, height=200, min=tif_color_scale.get('domainMin'),
+                                        max=tif_color_scale.get('domainMax'),
+                                        position="topleft",
+                                        tickDecimals=2, unit=" ",
+                                        colorscale=tif_color_scale.get('colorscale'),
+                                        style={"color": "white", "weight": 2})
+
             map_figure.extend([
                     dl.GeoTIFFOverlay(id="raster", interactive=True, url=tif_url, band=0, opacity=1,
                                       **tif_color_scale),
-                    dl.Colorbar(width=200, height=20, min=tif_color_scale.get('domainMin'),
-                                max=tif_color_scale.get('domainMax'),
-                                position="topleft",
-                                tickDecimals=2, unit=" ",
-                                colorscale=tif_color_scale.get('colorscale'),
-                                style={"color": "white", "weight": 2})
+                    color_bar
                 ])
 
             map_figure = [dl.Map(children=map_figure, center=tif_data.center, zoom=15)]
@@ -156,6 +170,8 @@ def update_basemap(year: int, data_type: str, week_number: int, site_name: str, 
             )
 
             return map_figure, figure
+
+        map_figure = [dl.Map(children=map_figure, center=SITE_LOCATION_MAPPER.get(site_name), zoom=17)]
 
         return map_figure, default_hist
 
