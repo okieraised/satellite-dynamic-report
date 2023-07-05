@@ -114,7 +114,7 @@ def update_basemap(year: int, data_type: str, week_number: int, site_name: str, 
             obj_path = ''.join([prefix, file_name])
             logger.info(f"rendering object {obj_path}")
 
-            tif_data = GeoTiffObject(obj_path)
+            tif_data = GeoTiffObject(obj_path, data_type=data_type)
             tif_url = tif_data.gen_url()
             tif_color_scale = tif_data.generate_color_scheme()
             logger.info(f"geotiff url: {tif_url}")
@@ -188,15 +188,16 @@ def update_basemap(year: int, data_type: str, week_number: int, site_name: str, 
         Input(component_id="raster", component_property='click_lat_lng_val'),
     ],
     [
-        State('selected-data-2', 'figure'),
+        State(component_id='selected-data-2', component_property='figure'),
         State(component_id="slider", component_property="value"),
         State(component_id="week-dropdown", component_property="value"),
+        State(component_id="data-type-dropdown", component_property="value"),
     ],
     prevent_initial_call=True,
     allow_duplicate=True
 )
-def show_pixel(click_lat_lng, fig, year: int, week: int):
-    logger.info(f"show_pixel: year: {year} | week: {week}")
+def show_pixel(click_lat_lng, fig, year: int, week: int, data_type: str):
+    logger.info(f"show_pixel: year: {year} | week: {week} | data_type: {data_type}")
     try:
         old_data = fig.get('data')
         new_data = [d for d in old_data if d['name'] != 'selected pixel']
@@ -207,6 +208,10 @@ def show_pixel(click_lat_lng, fig, year: int, week: int):
         lat = click_lat_lng[0]
         long = click_lat_lng[1]
         value = click_lat_lng[2]
+
+        if data_type == DataType.GPP:
+            value = value * 0.01
+
         logger.info(f"lat: {lat} | long: {long} | value: {value}")
 
         new_data.append(go.Scatter(x=[get_date_from_week_number(year=year, week=week)],

@@ -5,7 +5,7 @@ import numpy as np
 import rasterio as rio
 
 from rasterio.coords import BoundingBox
-from constants.constants import MINIO_ENDPOINT_URL, MINIO_BUCKET
+from constants.constants import MINIO_ENDPOINT_URL, MINIO_BUCKET, DataType
 from utils.datetime_utils import get_week_number
 from utils.logging import logger
 from utils.minio import Minio_Object
@@ -13,8 +13,9 @@ from utils.minio import Minio_Object
 
 class GeoTiffObject(object):
 
-    def __init__(self, obj: str):
+    def __init__(self, obj: str, data_type: str = None):
         self.obj = obj
+        self.data_type = data_type
         self.logger = logger
         self.data = self.get_minio_data()[0]
         self.pixels = []
@@ -45,7 +46,12 @@ class GeoTiffObject(object):
 
         for x in range(self.data.shape[0]):
             for y in range(self.data.shape[1]):
-                px_vals.append(self.data[x, y])
+                pix_val = None
+                if self.data_type == DataType.GPP:
+                    pix_val = self.data[x, y] * 0.01
+                else:
+                    pix_val = self.data[x, y]
+                px_vals.append(pix_val)
 
         return px_vals
 

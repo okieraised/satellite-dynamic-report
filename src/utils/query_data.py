@@ -40,7 +40,7 @@ def get_aggregate_of_data(data_type: str, site_name: str):
                 if not validate_file_format(d_date):
                     continue
 
-                tif_data = GeoTiffObject(o_path)
+                tif_data = GeoTiffObject(o_path, data_type=data_type)
                 max_pix = tif_data.max_pix()
                 min_pix = tif_data.min_pix()
                 avg_pix = tif_data.avg_pix()
