@@ -146,6 +146,8 @@ def update_basemap(year: int, data_type: str, week_number: int, site_name: str, 
 
             map_figure = [dl.Map(children=map_figure, center=tif_data.center, zoom=15)]
 
+            print(f"tif_data.get_pixels(): {tif_data.get_pixels()}")
+
             figure = dict(
                 data=[go.Histogram(x=tif_data.get_pixels(), nbinsx=20)],
                 layout=dict(
@@ -311,6 +313,11 @@ def update_time_series_graph(variable_input, site_input):
     [
         Input(component_id="data-type-dropdown", component_property="value"),
         Input(component_id="site-dropdown", component_property="value"),
+        # Input(component_id="slider", component_property="value"),
+        # Input(component_id="data-type-dropdown", component_property="value"),
+        # Input(component_id="week-dropdown", component_property="value"),
+        # Input(component_id="site-dropdown", component_property="value"),
+        # Input(component_id='basemap-dropdown', component_property='value')
 
     ],
     allow_duplicate=True,
@@ -391,17 +398,20 @@ def update_available_week_data_dropdown(year_value: int, data_type: str, site_na
     [
         Input(component_id="data-type-dropdown", component_property="value"),
         Input(component_id="site-dropdown", component_property="value"),
+        Input(component_id='slider', component_property='value'),
+        Input(component_id='basemap-dropdown', component_property='value'),
+        Input(component_id="week-dropdown", component_property="value"),
 
     ],
     allow_duplicate=True,
 )
-def update_available_year_data_slider(data_type: str, site_name: str):
+def update_available_year_data_slider(data_type: str, site_name: str, year: int, base_map: str, week_number: int):
 
     res = {}
 
     available_years = []
 
-    logger.info(f"update year slider input - data_type: {data_type} | site_name: {site_name}")
+    logger.info(f"update year slider input - data_type: {data_type} | site_name: {site_name} | year: {year} | base_map: {base_map} | week_number: {week_number}")
 
     o_paths = get_obj_path(data_type=data_type, site_name=site_name)
 
