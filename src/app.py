@@ -329,7 +329,12 @@ def update_aggregate_figure(data_type: str, site_name: str):
             fig_data = [go.Scatter(x=df.index.tolist(), y=df[col_name].tolist(), name=col_name, mode="markers")
                         for col_name in df.columns]
 
-            return [go.Figure(generate_aggregate_figure(data=fig_data, xaxis="Time", yaxis="Pixel Value",
+            if data_type == DataType.GPP:
+                yaxis_text = "Pixel Value (gC/m2/day)"
+            else:
+                yaxis_text = "Pixel Value"
+
+            return [go.Figure(generate_aggregate_figure(data=fig_data, xaxis="Time", yaxis=yaxis_text,
                                                         title=f"Time series of Max/Min/Avg of pixels at {site_name}"))]
         else:
             return [go.Figure(generate_aggregate_figure(data=[go.Scatter(x=[], y=[])]))]

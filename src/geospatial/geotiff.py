@@ -54,6 +54,8 @@ class GeoTiffObject(object):
                         pix_val = 1
                     if self.data[x, y] < -1:
                         pix_val = -1
+                    else:
+                        pix_val = self.data[x, y]
                 else:
                     pix_val = self.data[x, y]
                 px_vals.append(pix_val)

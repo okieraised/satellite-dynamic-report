@@ -114,7 +114,7 @@ class DropdownMapper(object):
             "value": DataType.GPP,
         },
         {
-            "label": "Vegetation Health (VH)",
+            "label": "Vegetation Health Index (VHI)",
             "value": DataType.VH,
         },
     ]
