@@ -146,8 +146,11 @@ def update_basemap(year: int, data_type: str, week_number: int, site_name: str, 
 
             map_figure = [dl.Map(children=map_figure, center=tif_data.center, zoom=15)]
 
-            print(f"tif_data.get_pixels(): {tif_data.get_pixels()}")
-
+            histogram_title = f"Distribution of pixel values for {data_type} at {site_name}"
+            if data_type == DataType.GPP:
+                histogram_title = f"Distribution of pixel values for {data_type} (gC/m2/day) at {site_name}"
+            if data_type == DataType.VH:
+                histogram_title = f"Distribution of pixel values for {data_type}I at {site_name}"
             figure = dict(
                 data=[go.Histogram(x=tif_data.get_pixels(), nbinsx=20)],
                 layout=dict(
@@ -156,7 +159,7 @@ def update_basemap(year: int, data_type: str, week_number: int, site_name: str, 
                     font=dict(color="#2cfec1"),
                     autofill=True,
                     margin=dict(t=75, r=50, b=50, l=50),
-                    title=f"Distribution of pixel values for {data_type} at {site_name}",
+                    title=histogram_title,
                     xaxis={
                         'title': dict(
                             text="Value"
@@ -199,7 +202,7 @@ def update_basemap(year: int, data_type: str, week_number: int, site_name: str, 
     allow_duplicate=True
 )
 def show_pixel(click_lat_lng, fig, year: int, week: int, data_type: str):
-    logger.info(f"show_pixel: year: {year} | week: {week} | data_type: {data_type}")
+    logger.info(f"show_pixel - year: {year} | week: {week} | data_type: {data_type}")
     try:
         old_data = fig.get('data')
         new_data = [d for d in old_data if d['name'] != 'selected pixel']
@@ -313,16 +316,14 @@ def update_time_series_graph(variable_input, site_input):
     [
         Input(component_id="data-type-dropdown", component_property="value"),
         Input(component_id="site-dropdown", component_property="value"),
-        # Input(component_id="slider", component_property="value"),
-        # Input(component_id="data-type-dropdown", component_property="value"),
-        # Input(component_id="week-dropdown", component_property="value"),
-        # Input(component_id="site-dropdown", component_property="value"),
-        # Input(component_id='basemap-dropdown', component_property='value')
+        Input(component_id="slider", component_property="value"),
+        Input(component_id="week-dropdown", component_property="value"),
+        Input(component_id='basemap-dropdown', component_property='value')
 
     ],
     allow_duplicate=True,
 )
-def update_aggregate_figure(data_type: str, site_name: str):
+def update_aggregate_figure(data_type: str, site_name: str, year: int, week: int, map_type: str):
     try:
         df = get_aggregate_of_data(data_type=data_type, site_name=site_name)
         if not df.empty:
@@ -461,6 +462,6 @@ def update_available_year_data_slider(data_type: str, site_name: str, year: int,
 
 
 if __name__ == "__main__":
-    app.run_server(debug=True, port=18050, processes=1, threaded=True) # host="0.0.0.0",
+    app.run_server(debug=True, port=18050, processes=10, threaded=False) # host="0.0.0.0",
 
 
